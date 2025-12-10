@@ -48,11 +48,11 @@ function getStatusIcon(status) {
 // Get status color class
 function getStatusColorClass(status) {
     switch(status) {
-        case 'ready': return 'border-start border-5 border-success';
-        case 'breakdown': return 'border-start border-5 border-danger';
-        case 'maintenance': return 'border-start border-5 border-warning';
-        case 'standby': return 'border-start border-5 border-info';
-        default: return 'border-start border-5 border-secondary';
+        case 'ready': return 'border-start border-2 border-success';
+        case 'breakdown': return 'border-start border-2 border-danger';
+        case 'maintenance': return 'border-start border-2 border-warning';
+        case 'standby': return 'border-start border-2 border-info';
+        default: return 'border-start border-2 border-secondary';
     }
 }
 
@@ -87,16 +87,9 @@ function updateTime() {
         minute: "2-digit",
         second: "2-digit",
     });
-    const dateString = now.toLocaleDateString("id-ID", {
-        weekday: 'long',
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    });
-    
     const timeElement = document.getElementById("current-time");
     if (timeElement) {
-        timeElement.textContent = `${dateString} ${timeString}`;
+        timeElement.textContent = `${timeString}`;
     }
 }
 

@@ -4,13 +4,10 @@ import {
   updateDailyReport,
   deleteDailyReport,
   getDailyReportDetail,
-  getDailyReportStats,
   getDailyReportSummary,
   generateDailyReport,
-  getWeeklyPeriods,
   getAvailableEquipmentForDate,
   getActivePeriodForDate,
-  getCurrentPeriodInfo,
   getAllEmployees,
   getAllEquipments,
 } from "../../utils/api.js";
@@ -23,19 +20,16 @@ function formatNumber(num) {
   return new Intl.NumberFormat("id-ID").format(num || 0);
 }
 
-// Format date
 function formatDate(dateString) {
   if (!dateString) return "-";
 
   try {
     const date = new Date(dateString);
-
     if (isNaN(date.getTime())) {
       return "-";
     }
 
     return date.toLocaleDateString("id-ID", {
-      weekday: "short",
       day: "numeric",
       month: "short",
       year: "numeric",
@@ -46,34 +40,18 @@ function formatDate(dateString) {
   }
 }
 
-// Format date range
-function formatDateRange(dateString) {
-  if (!dateString) return "-";
-  
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      return "-";
-    }
-    
-    return date.toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  } catch (error) {
-    console.error("Error formatting date range:", dateString, error);
-    return "-";
-  }
+function formatLocalDate(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
-// Kalkulasi persentase achievement
 function calculateAchievement(actual, target) {
   if (!target || target === 0) return 0;
   return Math.round((actual / target) * 100);
 }
 
-// toast notification
 function showToast(type, title, message) {
   const existingToasts = document.querySelectorAll(".toast");
   existingToasts.forEach((toast) => toast.remove());
@@ -95,7 +73,6 @@ function showToast(type, title, message) {
   toast.show();
 }
 
-// Update current time
 function updateTime() {
   const now = new Date();
   const timeString = now.toLocaleTimeString("id-ID", {
@@ -112,45 +89,50 @@ function updateTime() {
 async function updatePeriodAndEquipment(date, isEdit = false) {
   if (!date) return;
 
-  const periodDisplay = isEdit 
+  const periodDisplay = isEdit
     ? document.getElementById("edit_period_display")
     : document.getElementById("period_display");
-    
-  const periodInput = isEdit 
+
+  const periodInput = isEdit
     ? document.getElementById("edit_period_id")
     : document.getElementById("period_id");
-    
+
   const equipmentCountInput = isEdit
     ? document.getElementById("edit_total_equipment_ready")
     : document.getElementById("total_equipment_ready");
-    
+
   const attendanceCountInput = isEdit
     ? document.getElementById("edit_total_employees_present")
     : document.getElementById("total_employees_present");
 
   try {
-    // Get active period for the date
-    const activePeriod = await getActivePeriodForDate(date);
-    
-    if (activePeriod.ok && activePeriod.data) {
-      const period = activePeriod.data;
+    // Get active period for the date - PERBAIKAN: Gunakan endpoint yang benar
+    const response = await getActivePeriodForDate(date);
 
-      
+    // Pastikan response memiliki data yang valid
+    if (response.ok && response.data) {
+      const period = response.data;
+
       if (periodDisplay) {
         periodDisplay.innerHTML = `
           <div class="alert alert-info mb-0">
             <i class="bi bi-calendar-check me-2"></i>
             <strong>${period.period_code || "N/A"}</strong>
             <br>
-            <small>Target: ${formatNumber(period.target_tonnage || 0)} tons</small>
+            <small>Target: ${formatNumber(
+              period.target_tonnage || 0
+            )} tons</small>
           </div>
         `;
       }
-      
+
       if (periodInput) {
         periodInput.value = period.period_id;
       }
     } else {
+      // Tidak ada period aktif atau error
+      console.warn("No active period found or error:", response);
+
       if (periodDisplay) {
         periodDisplay.innerHTML = `
           <div class="alert alert-warning mb-0">
@@ -160,21 +142,16 @@ async function updatePeriodAndEquipment(date, isEdit = false) {
           </div>
         `;
       }
-      if (periodInput) periodInput.value = '';
-      
-      // Set equipment count to 0 if no period
-      if (equipmentCountInput) {
-        equipmentCountInput.value = 0;
+      if (periodInput) {
+        periodInput.value = "";
       }
-      if (attendanceCountInput) {
-        attendanceCountInput.value = 0;
-      }
-      return;
+
+      // Tetap coba ambil data equipment dan attendance
     }
 
-    // Update equipment count
+    // Update equipment count - tetap dijalankan meski tidak ada period
     const equipmentResponse = await getAvailableEquipmentForDate(date);
-    
+
     if (equipmentResponse.ok && equipmentResponse.data) {
       if (equipmentCountInput) {
         equipmentCountInput.value = equipmentResponse.data.length;
@@ -187,6 +164,7 @@ async function updatePeriodAndEquipment(date, isEdit = false) {
 
     // Update attendance count (dari summary)
     const summaryResponse = await getDailyReportSummary(date);
+
     if (summaryResponse.ok && summaryResponse.data) {
       if (attendanceCountInput) {
         attendanceCountInput.value = summaryResponse.data.attendance_count || 0;
@@ -196,28 +174,88 @@ async function updatePeriodAndEquipment(date, isEdit = false) {
         attendanceCountInput.value = 0;
       }
     }
-    
   } catch (error) {
     console.error("Error updating period and equipment:", error);
     showToast("danger", "Error", "Failed to load period information");
+
+    // Fallback: coba gunakan periodsList yang sudah di-load
+    const fallbackPeriod = findPeriodInList(date);
+    if (fallbackPeriod && periodDisplay) {
+      periodDisplay.innerHTML = `
+        <div class="alert alert-info mb-0">
+          <i class="bi bi-calendar-check me-2"></i>
+          <strong>${fallbackPeriod.period_code}</strong> (from cache)
+          <br>
+          <small>Target: ${formatNumber(
+            fallbackPeriod.target_tonnage
+          )} tons</small>
+        </div>
+      `;
+      if (periodInput) {
+        periodInput.value = fallbackPeriod.period_id;
+      }
+    }
   }
 }
 
-// Load daily reports data
+// Helper function untuk mencari period di periodsList
+function findPeriodInList(date) {
+  if (!date || periodsList.length === 0) return null;
+
+  const targetDate = new Date(date);
+
+  for (const period of periodsList) {
+    const startDate = new Date(period.start_date);
+    const endDate = new Date(period.end_date);
+
+    // Periksa apakah tanggal target berada di antara start_date dan end_date
+    if (targetDate >= startDate && targetDate <= endDate) {
+      return period;
+    }
+  }
+
+  return null;
+}
+
+async function checkActivePeriodForDate(date) {
+  if (!date) {
+    return null;
+  }
+
+  try {
+    const response = await getActivePeriodForDate(date);
+
+    if (response.ok && response.data) {
+      return response.data;
+    } else {
+      console.warn(
+        "No active period found for date:",
+        date,
+        "Response:",
+        response
+      );
+      return null;
+    }
+  } catch (error) {
+    console.error("Error checking active period:", error);
+    return null;
+  }
+}
+
 async function loadDailyReports() {
   try {
     const tbody = document.getElementById("reports-table-body");
     if (tbody) {
       tbody.innerHTML = `
-                <tr>
-                    <td colspan="8" class="text-center py-5">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p class="mt-2 text-muted">Loading daily reports...</p>
-                    </td>
-                </tr>
-            `;
+        <tr>
+          <td colspan="8" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">Loading daily reports...</p>
+          </td>
+        </tr>
+      `;
     }
 
     const response = await getAllDailyReports();
@@ -227,16 +265,17 @@ async function loadDailyReports() {
 
     reportsList = response.data || [];
 
-    // Load periods if not loaded
     if (periodsList.length === 0) {
       await loadPeriods();
     }
 
-    // Update stats and summary
     await updateStatistics();
 
-    // Render table
     renderReportsTable(reportsList);
+
+    setTimeout(() => {
+      initializeChart();
+    }, 500);
   } catch (error) {
     console.error("Error loading daily reports:", error);
     showToast("danger", "Error", "Failed to load daily reports data");
@@ -244,161 +283,329 @@ async function loadDailyReports() {
     const tbody = document.getElementById("reports-table-body");
     if (tbody) {
       tbody.innerHTML = `
-                <tr>
-                    <td colspan="8" class="text-center py-5">
-                        <i class="bi bi-exclamation-triangle text-danger fs-1"></i>
-                        <p class="mt-2 text-danger">Failed to load data</p>
-                        <button class="btn btn-sm btn-primary mt-2" onclick="loadDailyReports()">
-                            <i class="bi bi-arrow-clockwise me-1"></i> Try Again
-                        </button>
-                    </td>
-                </tr>
-            `;
+        <tr>
+          <td colspan="8" class="text-center py-5">
+            <i class="bi bi-exclamation-triangle text-danger fs-1"></i>
+            <p class="mt-2 text-danger">Failed to load data</p>
+            <button class="btn btn-sm btn-primary mt-2" onclick="loadDailyReports()">
+              <i class="bi bi-arrow-clockwise me-1"></i> Try Again
+            </button>
+          </td>
+        </tr>
+      `;
     }
   }
 }
 
-// Load periods for dropdown
 async function loadPeriods() {
+  const today = new Date().toISOString().split("T")[0];
+
   try {
-    const response = await getWeeklyPeriods();
+    const response = await getActivePeriodForDate(today);
+
     if (response.ok && response.data) {
-      periodsList = response.data;
-      populatePeriodsDropdown();
+      periodsList = Array.isArray(response.data)
+        ? response.data
+        : [response.data];
+
+      periodsList.forEach((period, index) => {
+        console.log(`Period ${index + 1}:`, {
+          period_code: period.period_code,
+          start_date: period.start_date,
+          end_date: period.end_date,
+          target_tonnage: period.target_tonnage,
+        });
+      });
+    } else {
+      console.error("Failed to load periods:", response);
     }
   } catch (error) {
     console.error("Error loading periods:", error);
   }
 }
 
-function populatePeriodsDropdown() {
-  const addDropdown = document.getElementById("period_id");
-  const editDropdown = document.getElementById("edit_period_id");
-
-  if (addDropdown) {
-    addDropdown.innerHTML = '<option value="">Select Period</option>';
-    periodsList.forEach((period) => {
-      const option = document.createElement("option");
-      option.value = period.period_id;
-      option.textContent = period.period_code;
-      addDropdown.appendChild(option);
-    });
-  }
-
-  if (editDropdown) {
-    editDropdown.innerHTML = '<option value="">Select Period</option>';
-    periodsList.forEach((period) => {
-      const option = document.createElement("option");
-      option.value = period.period_id;
-      option.textContent = period.period_code;
-      editDropdown.appendChild(option);
-    });
-  }
-}
-
-// Update statistics
 async function updateStatistics() {
   try {
-    // Get stats
-    const statsResponse = await getDailyReportStats();
-    if (statsResponse.ok && statsResponse.data) {
-      const stats = statsResponse.data;
+    const today = new Date().toISOString().split("T")[0];
 
-      // Get current period info
-      const periodResponse = await getCurrentPeriodInfo();
-      if (periodResponse.ok && periodResponse.data) {
-        const periodInfo = periodResponse.data;
-        
-        // Update period info in stats card
-        if (periodInfo.period) {
-          const periodElement = document.getElementById("period-info");
-          if (periodElement) {
-            periodElement.innerHTML = `
-              <small class="opacity-75">
-                Period: ${periodInfo.period.period_code} | 
-                Target: ${formatNumber(periodInfo.period.target_tonnage)} tons
-              </small>
-            `;
-          }
-        }
-      } else {
-        document.getElementById("today-tonnage").textContent = "0 tons";
-        document.getElementById("active-employees").textContent = "0";
-        document.getElementById("ready-equipment").textContent = "0";
-        document.getElementById("tonnage-progress").style.width = "0%";
-        document.getElementById("today-target").textContent = "0 tons";
-      }
+    const sortedReports = [...reportsList].sort(
+      (a, b) => new Date(b.date) - new Date(a.date)
+    );
 
-      document.getElementById("monthly-total").textContent = `${formatNumber(
-        stats.monthly_tonnage
-      )} tons`;
+    const latestReport = sortedReports.length > 0 ? sortedReports[0] : null;
+
+    const todayReport = reportsList.find((r) => {
+      if (!r.date) return false;
+      const reportDate = new Date(r.date).toISOString().split("T")[0];
+      return reportDate === today;
+    });
+
+    let todayPeriod = null;
+    const activePeriodResponse = await checkActivePeriodForDate(today);
+    if (activePeriodResponse) {
+      todayPeriod = activePeriodResponse;
     }
 
-    // Update summary
-    await updateDailySummary();
+    const todayTonnage = todayReport
+      ? parseFloat(todayReport.daily_tonnage) || 0
+      : 0;
+    document.getElementById("today-tonnage").textContent = `${formatNumber(
+      todayTonnage
+    )} tons`;
+
+    const todayTarget = todayPeriod
+      ? parseFloat(todayPeriod.target_tonnage) || 0
+      : 0;
+    const targetElement = document.getElementById("today-target");
+    if (targetElement) {
+      targetElement.textContent = `${formatNumber(todayTarget)} tons`;
+    }
+
+    const progressBar = document.getElementById("tonnage-progress");
+    if (progressBar) {
+      if (todayTarget > 0) {
+        const progressPercent = Math.min(
+          (todayTonnage / todayTarget) * 100,
+          100
+        );
+        progressBar.style.width = `${progressPercent}%`;
+        progressBar.textContent = `${Math.round(progressPercent)}%`;
+      } else {
+        progressBar.style.width = "0%";
+        progressBar.textContent = "0%";
+      }
+    }
+
+    let activeEmployees = 0;
+    try {
+      const employeesResponse = await getAllEmployees();
+      if (employeesResponse.ok && employeesResponse.data) {
+        activeEmployees = employeesResponse.data.filter(
+          (emp) => emp.status === "active"
+        ).length;
+      } else {
+        console.warn("Failed to fetch employees data, using fallback");
+        activeEmployees = todayReport
+          ? parseInt(todayReport.total_employees_present) || 0
+          : 0;
+      }
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+      activeEmployees = todayReport
+        ? parseInt(todayReport.total_employees_present) || 0
+        : 0;
+    }
+    document.getElementById("active-employees").textContent = activeEmployees;
+
+    let readyEquipment = 0;
+    try {
+      const equipmentResponse = await getAllEquipments();
+      if (equipmentResponse.ok && equipmentResponse.data) {
+        readyEquipment = equipmentResponse.data.filter(
+          (eq) => eq.default_status === "ready"
+        ).length;
+      } else {
+        console.warn("Failed to fetch equipment data, using fallback");
+        readyEquipment = todayReport
+          ? parseInt(todayReport.total_equipment_ready) || 0
+          : 0;
+      }
+    } catch (error) {
+      console.error("Error fetching equipment:", error);
+      readyEquipment = todayReport
+        ? parseInt(todayReport.total_equipment_ready) || 0
+        : 0;
+    }
+    document.getElementById("ready-equipment").textContent = readyEquipment;
+
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+    let monthlyTotal = 0;
+
+    reportsList.forEach((report) => {
+      if (!report.date) return;
+
+      const reportDate = new Date(report.date);
+      if (
+        reportDate.getMonth() + 1 === currentMonth &&
+        reportDate.getFullYear() === currentYear
+      ) {
+        monthlyTotal += parseFloat(report.daily_tonnage) || 0;
+      }
+    });
+
+    document.getElementById("monthly-total").textContent = `${formatNumber(
+      monthlyTotal
+    )} tons`;
+
+    if (latestReport) {
+      const latestTonnage = parseFloat(latestReport.daily_tonnage) || 0;
+      const latestTarget = latestReport.target_tonnage
+        ? parseFloat(latestReport.target_tonnage)
+        : 0;
+      const achievement = calculateAchievement(latestTonnage, latestTarget);
+
+      document.getElementById("summary-tonnage").textContent = `${formatNumber(
+        latestTonnage
+      )} tons`;
+      document.getElementById(
+        "summary-achievement"
+      ).textContent = `${achievement}%`;
+      document.getElementById("summary-attendance").textContent = `${
+        latestReport.total_employees_present || 0
+      } employees`;
+      document.getElementById("summary-equipment").textContent = `${
+        latestReport.total_equipment_ready || 0
+      } units`;
+    } else {
+      document.getElementById("summary-tonnage").textContent = "0 tons";
+      document.getElementById("summary-achievement").textContent = "0%";
+      document.getElementById("summary-attendance").textContent = "0 employees";
+      document.getElementById("summary-equipment").textContent = "0 units";
+    }
   } catch (error) {
     console.error("Error updating statistics:", error);
   }
 }
 
-// Update daily summary
-async function updateDailySummary() {
-  const today = new Date().toISOString().split("T")[0];
-  try {
-    const summaryResponse = await getDailyReportSummary(today);
-    if (summaryResponse.ok && summaryResponse.data) {
-      const summary = summaryResponse.data;
+function initializeChart() {
+  const canvas = document.getElementById("productionChart");
+  if (!canvas) return;
 
-      // Find today's period
-      const todayPeriod = periodsList.find((p) => {
-        const start = new Date(p.start_date);
-        const end = new Date(p.end_date);
-        const todayDate = new Date(today);
-        return todayDate >= start && todayDate <= end;
-      });
+  if (productionChart) {
+    productionChart.destroy();
+  }
 
-      if (todayPeriod) {
-        const achievement = calculateAchievement(
-          summary.total_tonnage,
-          todayPeriod.target_tonnage
-        );
-        document.getElementById(
-          "summary-tonnage"
-        ).textContent = `${formatNumber(summary.total_tonnage)} tons`;
-        document.getElementById(
-          "summary-achievement"
-        ).textContent = `${achievement}%`;
+  const last7Days = [];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    last7Days.push(formatLocalDate(d));
+  }
+
+  const labels = last7Days.map((dateStr) => {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    return new Date(y, m - 1, d)
+      .toLocaleDateString("id-ID", {
+        weekday: "short",
+        day: "numeric",
+      })
+      .replace(".", "");
+  });
+
+  const tonnageData = last7Days.map((date) => {
+    const report = reportsList.find((r) => {
+      if (!r.date) return false;
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(r.date)) {
+        return r.date === date;
       }
 
-      document.getElementById(
-        "summary-attendance"
-      ).textContent = `${summary.attendance_count} employees`;
-      document.getElementById(
-        "summary-equipment"
-      ).textContent = `${summary.equipment_count} units`;
-    }
-  } catch (error) {
-    console.error("Error updating daily summary:", error);
+      return formatLocalDate(new Date(r.date)) === date;
+    });
+
+    return report ? Number(report.daily_tonnage) || 0 : 0;
+  });
+
+  if (!tonnageData.some((v) => v > 0)) {
+    canvas.parentElement.innerHTML = `
+      <div class="text-center py-5">
+        <i class="bi bi-bar-chart fs-1 text-muted"></i>
+        <p class="mt-2 text-muted">
+          No production data available for the last 7 days
+        </p>
+      </div>
+    `;
+    return;
   }
+
+  productionChart = new Chart(canvas, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Daily Tonnage (tons)",
+          data: tonnageData,
+          borderColor: "#4caf50",
+          backgroundColor: "rgba(76, 175, 80, 0.15)",
+          borderWidth: 3,
+          tension: 0.35,
+          fill: true,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          pointBackgroundColor: "#4caf50",
+          pointBorderColor: "#fff",
+          pointBorderWidth: 2,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        intersect: false,
+        mode: "index",
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: "top",
+        },
+        tooltip: {
+          backgroundColor: "rgba(0,0,0,0.8)",
+          padding: 10,
+          callbacks: {
+            title(ctx) {
+              const index = ctx[0].dataIndex;
+              return `Date: ${formatDate(last7Days[index])}`;
+            },
+            label(ctx) {
+              return `Tonnage: ${formatNumber(ctx.raw)} tons`;
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: {
+            color: "rgba(0,0,0,0.05)",
+          },
+        },
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: "Tonnage (tons)",
+          },
+          ticks: {
+            callback: (v) => formatNumber(v),
+          },
+        },
+      },
+    },
+  });
 }
 
-// Render reports table
 function renderReportsTable(reports) {
   const tbody = document.getElementById("reports-table-body");
   if (!tbody) return;
 
   if (!reports || reports.length === 0) {
     tbody.innerHTML = `
-            <tr>
-                <td colspan="8" class="text-center py-5">
-                    <i class="bi bi-clipboard-data fs-1 text-muted"></i>
-                    <p class="mt-2 text-muted">No daily reports found</p>
-                    <button class="btn btn-sm btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addReportModal">
-                        Add First Report
-                    </button>
-                </td>
-            </tr>
-        `;
+      <tr>
+        <td colspan="8" class="text-center py-5">
+          <i class="bi bi-clipboard-data fs-1 text-muted"></i>
+          <p class="mt-2 text-muted">No daily reports found</p>
+          <button class="btn btn-sm btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addReportModal">
+            Add First Report
+          </button>
+        </td>
+      </tr>
+    `;
     return;
   }
 
@@ -416,152 +623,74 @@ function renderReportsTable(reports) {
           : "bg-danger";
 
       return `
-                <tr>
-                    <td>
-                        <div class="fw-bold">${formatDate(report.date)}</div>
-                        <small class="text-muted">${new Date(
-                          report.date
-                        ).toLocaleDateString("id-ID")}</small>
-                    </td>
-                    <td>
-                        <span class="badge bg-primary">${
-                          report.period_code || "-"
-                        }</span>
-                    </td>
-                    <td>
-                        <div class="fw-bold">${formatNumber(
-                          report.daily_tonnage
-                        )} tons</div>
-                        <small class="text-muted">Target: ${formatNumber(
-                          report.target_tonnage
-                        )} tons</small>
-                    </td>
-                    <td>
-                        <span class="badge bg-info">${
-                          report.total_employees_present || 0
-                        }</span>
-                    </td>
-                    <td>
-                        <span class="badge bg-warning">${
-                          report.total_equipment_ready || 0
-                        }</span>
-                    </td>
-                    <td>
-                        <span class="badge ${achievementClass}">
-                            ${achievement}%
-                        </span>
-                    </td>
-                    <td>
-                        ${
-                          report.notes
-                            ? `
-                            <div class="text-truncate" style="max-width: 200px;" 
-                                 title="${report.notes}">
-                                ${report.notes}
-                            </div>
-                        `
-                            : '<span class="text-muted">-</span>'
-                        }
-                    </td>
-                    <td class="text-end table-actions">
-                        <button class="btn btn-sm btn-outline-info me-1" onclick="viewReportDetails(${
-                          report.report_id
-                        })">
-                            <i class="bi bi-eye"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editReport(${
-                          report.report_id
-                        })">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteReport(${
-                          report.report_id
-                        })">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
+        <tr>
+          <td>
+            <div class="fw-bold">${formatDate(report.date)}</div>
+            <small class="text-muted">${new Date(
+              report.date
+            ).toLocaleDateString("id-ID", { weekday: "long" })}</small>
+          </td>
+          <td>
+            <span class="badge bg-primary">${report.period_code || "-"}</span>
+          </td>
+          <td>
+            <div class="fw-bold">${formatNumber(
+              report.daily_tonnage
+            )} tons</div>
+            <small class="text-muted">Target: ${formatNumber(
+              report.target_tonnage || 0
+            )} tons</small>
+          </td>
+          <td>
+            <span class="badge bg-info">${
+              report.total_employees_present || 0
+            }</span>
+          </td>
+          <td>
+            <span class="badge bg-warning">${
+              report.total_equipment_ready || 0
+            }</span>
+          </td>
+          <td>
+            <span class="badge ${achievementClass}">
+              ${achievement}%
+            </span>
+          </td>
+          <td>
+            ${
+              report.notes
+                ? `
+              <div class="text-truncate" style="max-width: 200px;" 
+                   title="${report.notes}">
+                ${report.notes}
+              </div>
+            `
+                : '<span class="text-muted">-</span>'
+            }
+          </td>
+          <td class="text-end table-actions">
+            <button class="btn btn-sm btn-outline-info me-1" onclick="viewReportDetails(${
+              report.report_id
+            })">
+              <i class="bi bi-eye"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-primary me-1" onclick="editReport(${
+              report.report_id
+            })">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteReport(${
+              report.report_id
+            })">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `;
     })
     .join("");
 }
 
-// Initialize production chart
-function initializeChart() {
-  const ctx = document.getElementById("productionChart");
-  if (!ctx) return;
-
-  // Destroy existing chart
-  if (productionChart) {
-    productionChart.destroy();
-  }
-
-  // Get last 7 days data
-  const last7Days = [...Array(7)]
-    .map((_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      return d.toISOString().split("T")[0];
-    })
-    .reverse();
-
-  // Prepare data
-  const labels = last7Days.map((date) => {
-    const d = new Date(date);
-    return d.toLocaleDateString("id-ID", { weekday: "short", day: "numeric" });
-  });
-
-  const tonnageData = last7Days.map((date) => {
-    const report = reportsList.find((r) => r.date === date);
-    return report ? report.daily_tonnage : 0;
-  });
-
-  productionChart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          label: "Daily Tonnage (tons)",
-          data: tonnageData,
-          borderColor: "#4caf50",
-          backgroundColor: "rgba(76, 175, 80, 0.1)",
-          tension: 0.4,
-          fill: true,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: "top",
-        },
-        tooltip: {
-          callbacks: {
-            label: function (context) {
-              return `${context.dataset.label}: ${formatNumber(
-                context.raw
-              )} tons`;
-            },
-          },
-        },
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function (value) {
-              return formatNumber(value);
-            },
-          },
-        },
-      },
-    },
-  });
-}
-
-// Fetch attendance count for selected date
 async function fetchAttendanceCount(isEdit = false) {
   const dateField = isEdit
     ? document.getElementById("edit_report_date")
@@ -592,7 +721,6 @@ async function fetchAttendanceCount(isEdit = false) {
   }
 }
 
-// Fetch equipment count for selected date
 async function fetchEquipmentCount(isEdit = false) {
   const dateField = isEdit
     ? document.getElementById("edit_report_date")
@@ -625,18 +753,40 @@ async function fetchEquipmentCount(isEdit = false) {
   }
 }
 
-// Auto-generate today's report
 async function autoGenerateReport() {
   const today = new Date().toISOString().split("T")[0];
 
-  if (!confirm(`Generate automatic daily report for today (${today})?`)) {
-    return;
-  }
-
   try {
+    const activePeriod = await checkActivePeriodForDate(today);
+
+    if (!activePeriod) {
+      showToast(
+        "warning",
+        "Cannot Generate Report",
+        `No active period found for today (${formatDate(
+          today
+        )}). Please create a weekly period first.`
+      );
+      return;
+    }
+
+    if (
+      !confirm(
+        `Generate automatic daily report for:\nDate: ${formatDate(
+          today
+        )}\nPeriod: ${activePeriod.period_code}\nTarget: ${formatNumber(
+          activePeriod.target_tonnage
+        )} tons\n\nProceed?`
+      )
+    ) {
+      return;
+    }
+
     const result = await generateDailyReport(today);
+
     showToast("success", "Success", "Daily report generated successfully");
-    loadDailyReports();
+
+    await loadDailyReports();
   } catch (error) {
     console.error("Error generating report:", error);
     showToast(
@@ -647,12 +797,10 @@ async function autoGenerateReport() {
   }
 }
 
-// Add new report
 async function addReport() {
   const reportData = {
     date: document.getElementById("report_date").value,
     daily_tonnage: document.getElementById("daily_tonnage").value,
-
     total_employees_present:
       document.getElementById("total_employees_present").value || 0,
     total_equipment_ready:
@@ -660,7 +808,6 @@ async function addReport() {
     notes: document.getElementById("notes").value,
   };
 
-  // Validation date
   if (!reportData.date || !reportData.daily_tonnage) {
     showToast("warning", "Validation", "Date and Daily Tonnage are required");
     return false;
@@ -669,7 +816,6 @@ async function addReport() {
   try {
     const response = await createDailyReport(reportData);
 
-    // Close modal and reset form
     const addModal = bootstrap.Modal.getInstance(
       document.getElementById("addReportModal")
     );
@@ -678,7 +824,6 @@ async function addReport() {
 
     showToast("success", "Success", "Daily report added successfully");
 
-    // Reload data
     loadDailyReports();
     return true;
   } catch (error) {
@@ -688,7 +833,6 @@ async function addReport() {
   }
 }
 
-// Edit report
 async function editReport(reportId) {
   try {
     const response = await getDailyReportDetail(reportId);
@@ -699,7 +843,6 @@ async function editReport(reportId) {
 
     const report = response.data;
 
-    // Fill form with report data
     document.getElementById("edit_report_id").value = report.report_id;
     document.getElementById("edit_report_date").value =
       report.date.split("T")[0];
@@ -711,7 +854,8 @@ async function editReport(reportId) {
       report.total_equipment_ready;
     document.getElementById("edit_notes").value = report.notes || "";
 
-    // Show modal
+    await updatePeriodAndEquipment(report.date.split("T")[0], true);
+
     const editModal = new bootstrap.Modal(
       document.getElementById("editReportModal")
     );
@@ -722,7 +866,6 @@ async function editReport(reportId) {
   }
 }
 
-// Update report
 async function updateReport() {
   const reportId = document.getElementById("edit_report_id").value;
   const reportData = {
@@ -738,7 +881,6 @@ async function updateReport() {
   try {
     await updateDailyReport(reportId, reportData);
 
-    // Close modal
     const editModal = bootstrap.Modal.getInstance(
       document.getElementById("editReportModal")
     );
@@ -746,7 +888,6 @@ async function updateReport() {
 
     showToast("success", "Success", "Daily report updated successfully");
 
-    // Reload data
     loadDailyReports();
     return true;
   } catch (error) {
@@ -760,7 +901,6 @@ async function updateReport() {
   }
 }
 
-// Delete report
 async function deleteReport(reportId) {
   if (
     !confirm(
@@ -775,7 +915,6 @@ async function deleteReport(reportId) {
 
     showToast("success", "Success", "Daily report deleted successfully");
 
-    // Reload data
     loadDailyReports();
   } catch (error) {
     console.error("Error deleting report:", error);
@@ -787,7 +926,6 @@ async function deleteReport(reportId) {
   }
 }
 
-// View report details
 async function viewReportDetails(reportId) {
   try {
     const response = await getDailyReportDetail(reportId);
@@ -803,7 +941,6 @@ async function viewReportDetails(reportId) {
       period?.target_tonnage || 0
     );
 
-    // Fill details
     document.getElementById("detail-date").textContent = formatDate(
       report.date
     );
@@ -824,7 +961,6 @@ async function viewReportDetails(reportId) {
     document.getElementById("detail-notes").textContent =
       report.notes || "No notes available.";
 
-    // Show modal
     const viewModal = new bootstrap.Modal(
       document.getElementById("viewDetailsModal")
     );
@@ -835,93 +971,34 @@ async function viewReportDetails(reportId) {
   }
 }
 
-// Export reports
-function exportReports(format) {
-  if (reportsList.length === 0) {
-    showToast("warning", "Warning", "No reports to export");
-    return;
-  }
-
-  if (format === "csv") {
-    exportToCSV();
-  } else {
-    showToast("info", "Info", "PDF export feature coming soon!");
-  }
-}
-
-function exportToCSV() {
-  const headers = [
-    "Date",
-    "Period",
-    "Tonnage",
-    "Employees",
-    "Equipment",
-    "Achievement",
-    "Notes",
-  ];
-  const rows = reportsList.map((report) => {
-    const period = periodsList.find((p) => p.period_id === report.period_id);
-    const achievement = calculateAchievement(
-      report.daily_tonnage,
-      period?.target_tonnage || 0
-    );
-
-    return [
-      report.date,
-      report.period_code,
-      report.daily_tonnage,
-      report.total_employees_present,
-      report.total_equipment_ready,
-      `${achievement}%`,
-      report.notes || "",
-    ];
-  });
-
-  const csvContent = [
-    headers.join(","),
-    ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
-  ].join("\n");
-
-  const blob = new Blob([csvContent], { type: "text/csv" });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `daily_reports_${new Date().toISOString().split("T")[0]}.csv`;
-  a.click();
-
-  showToast("success", "Export", "CSV file downloaded");
-}
-
-function printReports() {
-  window.print();
-}
-
-// Logout function
 function logout() {
   if (confirm("Are you sure you want to logout?")) {
     localStorage.removeItem("auth_token");
     sessionStorage.clear();
-    window.location.href = "login.html";
+    window.location.href = "../auth/login.html";
   }
 }
 
-// Initialize the page
 function initializePage() {
-  loadDailyReports();
+  loadPeriods().then(() => {
+    // Kemudian load reports
+    loadDailyReports();
+
+    // Update period untuk tanggal hari ini
+    const today = new Date().toISOString().split("T")[0];
+    const dateInput = document.getElementById("report_date");
+    const filterInput = document.getElementById("date-filter");
+
+    if (dateInput) {
+      dateInput.value = today;
+      setTimeout(() => updatePeriodAndEquipment(today, false), 1000);
+    }
+
+    if (filterInput) filterInput.value = today;
+  });
 
   setInterval(updateTime, 1000);
   updateTime();
-
-  const today = new Date().toISOString().split("T")[0];
-  const dateInput = document.getElementById("report_date");
-  const filterInput = document.getElementById("date-filter");
-
-  if (dateInput) {
-    dateInput.value = today;
-    setTimeout(() => updatePeriodAndEquipment(today, false), 500);
-  }
-
-  if (filterInput) filterInput.value = today;
 
   document
     .getElementById("btn-save-report")
@@ -938,9 +1015,11 @@ function initializePage() {
     ?.addEventListener("click", autoGenerateReport);
   document
     .getElementById("update-summary-btn")
-    ?.addEventListener("click", updateDailySummary);
+    ?.addEventListener("click", () => {
+      updateStatistics();
+      showToast("info", "Info", "Summary updated successfully");
+    });
 
-  // Form submit handlers
   document
     .getElementById("addReportForm")
     ?.addEventListener("submit", function (e) {
@@ -955,7 +1034,6 @@ function initializePage() {
       updateReport();
     });
 
-  // Date filter change
   document
     .getElementById("date-filter")
     ?.addEventListener("change", function () {
@@ -971,31 +1049,24 @@ function initializePage() {
       renderReportsTable(filtered);
     });
 
-  // Modal show events
   document
     .getElementById("addReportModal")
     ?.addEventListener("shown.bs.modal", function () {
       document.getElementById("report_date").focus();
     });
 
-  // Add event listener untuk perubahan tanggal di form add
   document
     .getElementById("report_date")
     ?.addEventListener("change", function () {
       updatePeriodAndEquipment(this.value, false);
     });
 
-  // Add event listener untuk perubahan tanggal di form edit
   document
     .getElementById("edit_report_date")
     ?.addEventListener("change", function () {
       updatePeriodAndEquipment(this.value, true);
     });
 
-  // Initialize chart after data loads
-  setTimeout(initializeChart, 1000);
-
-  // Keyboard shortcuts
   document.addEventListener("keydown", function (e) {
     if (e.ctrlKey && e.key === "n") {
       e.preventDefault();
@@ -1012,29 +1083,15 @@ function initializePage() {
   });
 }
 
-document.getElementById("report_date")?.addEventListener("change", function () {
-  updatePeriodAndEquipment(this.value, false);
-});
-
-document
-  .getElementById("edit_report_date")
-  ?.addEventListener("change", function () {
-    updatePeriodAndEquipment(this.value, true);
-  });
-
-// Initialize when DOM is fully loaded
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initializePage);
 } else {
   initializePage();
 }
 
-
-// Make functions available globally
 window.editReport = editReport;
 window.deleteReport = deleteReport;
 window.viewReportDetails = viewReportDetails;
 window.fetchAttendanceCount = fetchAttendanceCount;
 window.fetchEquipmentCount = fetchEquipmentCount;
-window.exportReports = exportReports;
-window.printReports = printReports;
+window.autoGenerateReport = autoGenerateReport;
