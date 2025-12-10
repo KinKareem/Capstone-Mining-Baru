@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pilih Role - Planner Portal</title>
+  <script type="module" src="/src/main.js" defer></script>
+</head>
+
+<body class="center-screen">
+  <div class="container" role="main">
+    <h1 class="title">Pilih Role Anda</h1>
+    <div class="role-option" aria-label="Pilihan Role">
+      <a href="/src/pages/auth/login/login.html?role=shipper_planner" class="btn btn-role"
+        aria-label="Masuk sebagai Shipper Planner">
+        <img src="/assets/Port.png" alt="Shipper Planner Icon" />
+        <span class="label">Shipper Planner</span>
+      </a>
+
+      <h2 class="OR">OR</h2>
+
+      <a href="/src/pages/auth/login/login.html?role=mining_planner" class="btn btn-role"
+        aria-label="Masuk sebagai Mining Planner">
+        <img src="/assets/Oil Pump.png" alt="Mining Planner Icon" />
+        <span class="label">Mining Planner</span>
+      </a>
+    </div>
+  </div>
+</body>
+
+</html>

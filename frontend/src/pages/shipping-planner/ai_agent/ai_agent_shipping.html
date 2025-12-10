@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chatbot</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #0a0a0a;
+      color: #f0f0f0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Menghilangkan scrollbar untuk semua elemen */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #1a1a1a;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+
+    /* Untuk Firefox */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #444 #1a1a1a;
+    }
+
+    .app-container {
+      display: flex;
+      height: 100vh;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: 260px;
+      background-color: #171717;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #2d2d2d;
+      transition: width 0.3s ease;
+      overflow: hidden;
+    }
+
+    .sidebar-header {
+      padding: 20px 16px;
+      border-bottom: 1px solid #2d2d2d;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #f0f0f0;
+    }
+
+    .new-chat-btn {
+      background-color: #2c92f1;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color 0.2s;
+    }
+
+    .new-chat-btn:hover {
+      background-color: #2cc3e9;
+    }
+
+
+    .back-btn {
+      background-color: #e10a0a;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color 0.2s;
+    }
+
+    .back-btn:hover {
+      background-color: #e10a0a;
+    }
+
+    .history-list {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 10px 0;
+    }
+
+    /* TAMBAHAN: Group tanggal untuk history chat */
+    .history-date-group {
+      padding: 8px 16px;
+      font-size: 11px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 500;
+      margin-top: 8px;
+    }
+
+    .history-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #2d2d2d;
+      transition: background-color 0.2s;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 44px;
+      word-break: break-word;
+    }
+
+    .history-item:hover {
+      background-color: #2d2d2d;
+    }
+
+    .history-item.active {
+      background-color: #2d2d2d;
+      border-left: 3px solid #3f90ca;
+    }
+
+    .history-title {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 160px;
+    }
+
+    .delete-history {
+      color: #888;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      transition: color 0.2s;
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+
+    .delete-history:hover {
+      color: #ff4757;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid #2d2d2d;
+      font-size: 12px;
+      color: #888;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    /* Main Chat Area */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: #0a0a0a;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid #2d2d2d;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .chat-header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .model-info {
+      background-color: #2d2d2d;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .model-info i {
+      color: #ffffff;
+    }
+
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .message {
+      display: flex;
+      max-width: 100%;
+      margin-bottom: 24px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .user-message {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin: 0 12px;
+      flex-shrink: 0;
+    }
+
+    .user-avatar {
+      background-color: #1b5576;
+    }
+
+    .ai-avatar {
+      background-color: #3d3d3d;
+    }
+
+    .message-content {
+      background-color: #2d2d2d;
+      padding: 16px 20px;
+      border-radius: 12px;
+      max-width: min(680px, 85%);
+      line-height: 1.5;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      hyphens: auto;
+    }
+
+    .user-message .message-content {
+      background-color: #1b5576;
+      color: white;
+      border-bottom-right-radius: 4px;
+      max-width: min(680px, 85%);
+    }
+
+    .ai-message .message-content {
+      border-bottom-left-radius: 4px;
+    }
+
+    .message-time {
+      font-size: 12px;
+      color: #888;
+      margin-top: 6px;
+      text-align: right;
+    }
+
+    .user-message .message-time {
+      text-align: left;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .input-container {
+      padding: 20px 24px;
+      border-top: 1px solid #2d2d2d;
+      flex-shrink: 0;
+    }
+
+    .input-wrapper {
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .chat-input {
+      width: 100%;
+      background-color: #2d2d2d;
+      border: 1px solid #444;
+      border-radius: 12px;
+      padding: 16px 60px 16px 20px;
+      color: #f0f0f0;
+      font-size: 16px;
+      resize: none;
+      min-height: 56px;
+      max-height: 200px;
+      line-height: 1.5;
+      transition: border-color 0.2s;
+      overflow-y: hidden;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+
+    .chat-input:focus {
+      outline: none;
+      border-color: #39dff8;
+    }
+
+    .chat-input::placeholder {
+      color: #888;
+    }
+
+    /* PERBAIKAN: Menghilangkan scrollbar di textarea */
+    .chat-input::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .chat-input::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .chat-input::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 3px;
+    }
+
+    .send-button {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      background-color: #2b79cd;
+      color: white;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+      flex-shrink: 0;
+    }
+
+    .send-button:hover {
+      background-color: #1e5189;
+    }
+
+    .send-button:disabled {
+      background-color: #2d2d2d;
+      cursor: not-allowed;
+    }
+
+    .input-footer {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #888;
+      text-align: center;
+    }
+
+    /* Loading Animation */
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      background-color: #2d2d2d;
+      border-radius: 12px;
+      width: fit-content;
+      margin-bottom: 24px;
+      max-width: min(680px, 85%);
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #888;
+      margin: 0 3px;
+      animation: typingAnimation 1.5s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typingAnimation {
+
+      0%,
+      60%,
+      100% {
+        transform: translateY(0);
+        opacity: 0.6;
+      }
+
+      30% {
+        transform: translateY(-10px);
+        opacity: 1;
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 0;
+        position: absolute;
+        left: 0;
+        z-index: 10;
+        height: 100%;
+      }
+
+      .sidebar.open {
+        width: 260px;
+      }
+
+      .menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background-color: #2d2d2d;
+        cursor: pointer;
+        margin-right: 12px;
+        flex-shrink: 0;
+      }
+
+      .chat-header {
+        padding: 16px;
+      }
+
+      .chat-header h1 {
+        font-size: 18px;
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .chat-container {
+        padding: 16px;
+      }
+
+      .message-content {
+        max-width: min(85%, 500px);
+      }
+
+      .user-message .message-content {
+        max-width: min(85%, 500px);
+      }
+
+      .input-container {
+        padding: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+        margin: 0 8px;
+      }
+
+      .message-content {
+        padding: 12px 16px;
+        max-width: 90%;
+      }
+
+      .user-message .message-content {
+        max-width: 90%;
+      }
+
+      .typing-indicator {
+        max-width: 90%;
+      }
+
+      .history-date-group {
+        padding: 6px 12px;
+        font-size: 10px;
+      }
+    }
+
+    /* Utility Classes */
+    .hidden {
+      display: none !important;
+    }
+
+    .menu-toggle {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- Sidebar dengan History Chat -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <button class="back-btn" id="backBtn">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+
+      </div>
+
+      <div class="history-list" id="historyList">
+        <!-- Riwayat chat akan ditampilkan di sini -->
+        <div class="history-item active" data-id="1">
+          <div class="history-title">Pembicaraan Baru</div>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        AI Chatbot v1.0 • Powered by n8n
+      </div>
+    </div>
+
+    <!-- Area Chat Utama -->
+    <div class="main-content">
+      <div class="chat-header">
+        <button class="new-chat-btn" id="newChatBtn">
+          <i class="fas fa-plus"></i> Baru
+        </button>
+        <div class="menu-toggle" id="menuToggle">
+          <i class="fas fa-bars"></i>
+        </div>
+        <h1 id="currentChatTitle">Pembicaraan Baru</h1>
+        <div class="model-info">
+          <i class="fas fa-robot"></i>
+          <span>AI Assistant</span>
+        </div>
+      </div>
+
+      <div class="chat-container" id="chatContainer">
+        <!-- Pesan-pesan akan ditampilkan di sini -->
+        <div class="message ai-message">
+          <div class="avatar ai-avatar">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div class="message-content">
+            Halo! Saya adalah asisten AI Anda. Bagaimana saya bisa membantu Anda hari ini?
+            <div class="message-time">Baru saja</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <div class="input-wrapper">
+          <textarea class="chat-input" id="chatInput" placeholder="Ketik pesan Anda di sini..." rows="1"></textarea>
+          <button class="send-button" id="sendButton">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+        <div class="input-footer">
+          AI Chatbot dapat membuat kesalahan. Periksa informasi penting.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Variabel global
+    let currentChatId = 1;
+    let chats = {
+      1: {
+        id: 1,
+        title: "Pembicaraan Baru",
+        messages: [
+          {
+            id: 1,
+            sender: 'ai',
+            content: 'Halo! Saya adalah asisten AI Anda. Bagaimana saya bisa membantu Anda hari ini?',
+            timestamp: new Date()
+          }
+        ],
+        createdAt: new Date(), // TAMBAHAN: Menyimpan tanggal pembuatan chat
+        lastActivity: new Date() // TAMBAHAN: Menyimpan waktu aktivitas terakhir
+      }
+    };
+
+    // Elemen DOM
+    const sidebar = document.getElementById('sidebar');
+    const menuToggle = document.getElementById('menuToggle');
+    const chatContainer = document.getElementById('chatContainer');
+    const chatInput = document.getElementById('chatInput');
+    const sendButton = document.getElementById('sendButton');
+    const newChatBtn = document.getElementById('newChatBtn');
+    const historyList = document.getElementById('historyList');
+    const currentChatTitle = document.getElementById('currentChatTitle');
+
+    // Fungsi untuk mendapatkan waktu yang diformat
+    function getFormattedTime(date) {
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+
+      if (diffMins < 1) return 'Baru saja';
+      if (diffMins < 60) return `${diffMins} menit yang lalu`;
+      if (diffHours < 24) return `${diffHours} jam yang lalu`;
+      if (diffDays < 7) return `${diffDays} hari yang lalu`;
+
+      return date.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+    }
+
+    // TAMBAHAN: Fungsi untuk mendapatkan tanggal yang diformat untuk group
+    function getFormattedDateForGroup(date) {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      const chatDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+      if (chatDate.getTime() === today.getTime()) {
+        return "Hari Ini";
+      } else if (chatDate.getTime() === yesterday.getTime()) {
+        return "Kemarin";
+      } else {
+        // Untuk minggu sebelumnya dan seterusnya
+        const diffMs = now - date;
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffDays < 7) {
+          const dayNames = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+          return dayNames[date.getDay()];
+        } else {
+          // Format tanggal lengkap untuk chat yang lebih lama
+          return date.toLocaleDateString('id-ID', {
+            year: 'numeric',
+            month: 'long'
+          });
+        }
+      }
+    }
+
+    // Fungsi untuk membuat ID unik
+    function generateId() {
+      return Date.now();
+    }
+
+    // Fungsi untuk membuat elemen pesan
+    function createMessageElement(message) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${message.sender}-message`;
+
+      const avatarClass = message.sender === 'user' ? 'user-avatar' : 'ai-avatar';
+      const avatarIcon = message.sender === 'user' ? 'fas fa-user' : 'fas fa-robot';
+
+      const formattedTime = getFormattedTime(new Date(message.timestamp));
+
+      messageDiv.innerHTML = `
+                <div class="avatar ${avatarClass}">
+                    <i class="${avatarIcon}"></i>
+                </div>
+                <div class="message-content">
+                    ${message.content}
+                    <div class="message-time">${formattedTime}</div>
+                </div>
+            `;
+
+      return messageDiv;
+    }
+
+    // Fungsi untuk menampilkan pesan
+    function displayMessage(message) {
+      const messageElement = createMessageElement(message);
+      chatContainer.appendChild(messageElement);
+      scrollToBottom();
+    }
+
+    // Fungsi untuk menggulir ke bawah
+    function scrollToBottom() {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    // Fungsi untuk menampilkan indikator mengetik
+    function showTypingIndicator() {
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'typing-indicator';
+      typingDiv.id = 'typingIndicator';
+      typingDiv.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+      chatContainer.appendChild(typingDiv);
+      scrollToBottom();
+    }
+
+    // Fungsi untuk menyembunyikan indikator mengetik
+    function hideTypingIndicator() {
+      const typingIndicator = document.getElementById('typingIndicator');
+      if (typingIndicator) {
+        typingIndicator.remove();
+      }
+    }
+
+    async function sendToAI(message, history) {
+      try {
+        const response = await fetch('https://pojer26018.app.n8n.cloud/webhook-test/freechat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message,
+            history
+          })
+        });
+
+        const data = await response.json();
+
+        // Ambil output dari JSON
+        if (data && data.output) {
+          return data.output;
+        }
+
+        return "Saya tidak dapat memproses permintaan Anda saat ini.";
+      } catch (error) {
+        console.error('Error:', error);
+        return "Maaf, terjadi kesalahan saat menghubungi AI. Silakan coba lagi.";
+      }
+    }
+
+    // Fungsi untuk membersihkan semua tanda bintang
+    function cleanAsterisks(text) {
+      if (!text) return '';
+
+      // 1. Hapus semua tanda bintang (*)
+      let cleanText = text.replace(/\*/g, '');
+
+      // 2. Hapus tanda pagar (#)
+      cleanText = cleanText.replace(/#/g, '');
+
+      // 3. Hapus backslash (\) yang mungkin muncul
+      cleanText = cleanText.replace(/\\/g, '');
+
+      // 4. Hapus tanda kutip ganda atau tunggal berlebih
+      cleanText = cleanText.replace(/["']/g, '');
+
+      // 5. Ganti multiple newlines dengan satu newline
+      cleanText = cleanText.replace(/\n{2,}/g, '\n');
+
+      // 6. Trim spasi di awal dan akhir setiap baris
+      cleanText = cleanText.split('\n').map(line => line.trim()).join('\n');
+
+      return cleanText;
+    }
+
+    // Bagian memproses output AI
+    async function processMessage() {
+      const messageText = chatInput.value.trim();
+      if (!messageText) return;
+
+      // Reset input
+      chatInput.value = '';
+      adjustTextareaHeight();
+
+      // Buat objek pesan user
+      const userMessage = {
+        id: generateId(),
+        sender: 'user',
+        content: messageText,
+        timestamp: new Date()
+      };
+      chats[currentChatId].messages.push(userMessage);
+      chats[currentChatId].lastActivity = new Date();
+      displayMessage(userMessage);
+
+      // Update judul chat jika pesan pertama
+      if (chats[currentChatId].messages.length === 2) {
+        const newTitle = messageText.length > 30 ? messageText.substring(0, 30) + '...' : messageText;
+        updateChatTitle(currentChatId, newTitle);
+      }
+
+      // Tampilkan indikator mengetik
+      showTypingIndicator();
+
+      // Siapkan history
+      const history = chats[currentChatId].messages.slice(0, -1).map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'assistant',
+        content: msg.content
+      }));
+
+      // Kirim ke AI
+      const aiResponse = await sendToAI(messageText, history);
+      hideTypingIndicator();
+
+      // Buat objek pesan AI dengan format
+      const aiMessage = {
+        id: generateId(),
+        sender: 'ai',
+        content: cleanAsterisks(aiResponse), // hapus semua *
+        timestamp: new Date()
+      };
+
+      chats[currentChatId].messages.push(aiMessage);
+      chats[currentChatId].lastActivity = new Date();
+      displayMessage(aiMessage);
+
+      saveChatsToStorage();
+    }
+
+    // Fungsi createMessageElement: support HTML (agar list tampil)
+    function createMessageElement(message) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${message.sender}-message`;
+
+      const avatarClass = message.sender === 'user' ? 'user-avatar' : 'ai-avatar';
+      const avatarIcon = message.sender === 'user' ? 'fas fa-user' : 'fas fa-robot';
+      const formattedTime = getFormattedTime(new Date(message.timestamp));
+
+      messageDiv.innerHTML = `
+    <div class="avatar ${avatarClass}">
+      <i class="${avatarIcon}"></i>
+    </div>
+    <div class="message-content">
+      ${message.content}
+      <div class="message-time">${formattedTime}</div>
+    </div>
+  `;
+
+      return messageDiv;
+    }
+
+    // Scroll ke bawah
+    function scrollToBottom() {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    // Fungsi adjust textarea
+    function adjustTextareaHeight() {
+      chatInput.style.height = 'auto';
+      chatInput.style.height = Math.min(chatInput.scrollHeight, 200) + 'px';
+      chatInput.style.overflowX = 'hidden';
+    }
+
+    // Fungsi untuk membuat chat baru
+    function createNewChat() {
+      const newChatId = generateId();
+      currentChatId = newChatId;
+
+      // Buat chat baru
+      chats[newChatId] = {
+        id: newChatId,
+        title: "Pembicaraan Baru",
+        messages: [],
+        createdAt: new Date(), // TAMBAHAN: Simpan tanggal pembuatan
+        lastActivity: new Date() // TAMBAHAN: Simpan waktu aktivitas
+      };
+
+      // Perbarui UI
+      updateHistoryList();
+      switchChat(newChatId);
+
+      // Kosongkan kontainer chat
+      chatContainer.innerHTML = '';
+
+      // Tampilkan pesan selamat datang
+      const welcomeMessage = {
+        id: generateId(),
+        sender: 'ai',
+        content: 'Halo! Saya adalah asisten AI Anda. Bagaimana saya bisa membantu Anda hari ini?',
+        timestamp: new Date()
+      };
+
+      chats[currentChatId].messages.push(welcomeMessage);
+      displayMessage(welcomeMessage);
+    }
+
+    // Fungsi untuk beralih chat
+    function switchChat(chatId) {
+      currentChatId = chatId;
+
+      // Perbarui judul chat
+      currentChatTitle.textContent = chats[chatId].title;
+
+      // Kosongkan kontainer chat
+      chatContainer.innerHTML = '';
+
+      // Tampilkan pesan-pesan chat yang dipilih
+      chats[chatId].messages.forEach(message => {
+        displayMessage(message);
+      });
+
+      // Perbarui riwayat sidebar
+      updateHistoryList();
+
+      // Tutup sidebar di perangkat mobile
+      if (window.innerWidth <= 768) {
+        sidebar.classList.remove('open');
+      }
+
+      // Fokus ke input
+      chatInput.focus();
+    }
+
+    // Fungsi untuk memperbarui judul chat
+    function updateChatTitle(chatId, newTitle) {
+      chats[chatId].title = newTitle;
+      currentChatTitle.textContent = newTitle;
+      updateHistoryList();
+      saveChatsToStorage();
+    }
+
+    // Fungsi untuk memperbarui daftar riwayat dengan grouping tanggal
+    function updateHistoryList() {
+      historyList.innerHTML = '';
+
+      // Urutkan chat berdasarkan waktu aktivitas terakhir (yang terbaru pertama)
+      const sortedChats = Object.values(chats).sort((a, b) => {
+        return new Date(b.lastActivity || b.createdAt) - new Date(a.lastActivity || a.createdAt);
+      });
+
+      // Kelompokkan chat berdasarkan tanggal
+      const chatGroups = {};
+      sortedChats.forEach(chat => {
+        const chatDate = new Date(chat.lastActivity || chat.createdAt);
+        const dateKey = getFormattedDateForGroup(chatDate);
+
+        if (!chatGroups[dateKey]) {
+          chatGroups[dateKey] = [];
+        }
+        chatGroups[dateKey].push(chat);
+      });
+
+      // Render chat groups
+      Object.keys(chatGroups).forEach(dateKey => {
+        // Tambahkan header tanggal
+        const dateHeader = document.createElement('div');
+        dateHeader.className = 'history-date-group';
+        dateHeader.textContent = dateKey;
+        historyList.appendChild(dateHeader);
+
+        // Tambahkan chat items untuk tanggal ini
+        chatGroups[dateKey].forEach(chat => {
+          const historyItem = document.createElement('div');
+          historyItem.className = `history-item ${chat.id == currentChatId ? 'active' : ''}`;
+          historyItem.setAttribute('data-id', chat.id);
+
+          historyItem.innerHTML = `
+                    <div class="history-title">${chat.title}</div>
+                    ${chat.id != 1 ? '<div class="delete-history"><i class="fas fa-trash"></i></div>' : ''}
+                `;
+
+          // Tambahkan event listener untuk memilih chat
+          historyItem.addEventListener('click', (e) => {
+            if (!e.target.closest('.delete-history')) {
+              switchChat(chat.id);
+            }
+          });
+
+          // Tambahkan event listener untuk menghapus chat
+          const deleteBtn = historyItem.querySelector('.delete-history');
+          if (deleteBtn) {
+            deleteBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              deleteChat(chat.id);
+            });
+          }
+
+          historyList.appendChild(historyItem);
+        });
+      });
+    }
+
+    // Fungsi untuk menghapus chat
+    function deleteChat(chatId) {
+      if (chatId == 1) return; // Jangan hapus chat default
+
+      if (Object.keys(chats).length === 1) {
+        alert('Anda tidak dapat menghapus satu-satunya chat yang tersisa.');
+        return;
+      }
+
+      // Hapus chat
+      delete chats[chatId];
+
+      // Jika chat yang dihapus sedang aktif, beralih ke chat pertama yang tersedia
+      if (currentChatId == chatId) {
+        const remainingChatIds = Object.keys(chats);
+        switchChat(remainingChatIds[0]);
+      }
+
+      // Perbarui UI
+      updateHistoryList();
+      saveChatsToStorage();
+    }
+
+    // Fungsi untuk menyimpan chat ke localStorage
+    function saveChatsToStorage() {
+      try {
+        localStorage.setItem('aiChats', JSON.stringify(chats));
+        localStorage.setItem('currentChatId', currentChatId.toString());
+      } catch (e) {
+        console.error('Gagal menyimpan chat ke localStorage:', e);
+      }
+    }
+
+    // Fungsi untuk memuat chat dari localStorage
+    function loadChatsFromStorage() {
+      try {
+        const savedChats = localStorage.getItem('aiChats');
+        const savedCurrentChatId = localStorage.getItem('currentChatId');
+
+        if (savedChats) {
+          const parsedChats = JSON.parse(savedChats);
+
+          // Konversi string tanggal kembali ke objek Date
+          Object.keys(parsedChats).forEach(chatId => {
+            parsedChats[chatId].messages.forEach(message => {
+              message.timestamp = new Date(message.timestamp);
+            });
+
+            // TAMBAHAN: Pastikan chat memiliki createdAt dan lastActivity
+            if (!parsedChats[chatId].createdAt) {
+              parsedChats[chatId].createdAt = new Date(parseInt(chatId) || Date.now());
+            } else {
+              parsedChats[chatId].createdAt = new Date(parsedChats[chatId].createdAt);
+            }
+
+            if (!parsedChats[chatId].lastActivity) {
+              // Gunakan timestamp dari pesan terakhir jika ada
+              const lastMessage = parsedChats[chatId].messages[parsedChats[chatId].messages.length - 1];
+              parsedChats[chatId].lastActivity = lastMessage ? new Date(lastMessage.timestamp) : new Date(parsedChats[chatId].createdAt);
+            } else {
+              parsedChats[chatId].lastActivity = new Date(parsedChats[chatId].lastActivity);
+            }
+          });
+
+          chats = parsedChats;
+        }
+
+        if (savedCurrentChatId) {
+          currentChatId = parseInt(savedCurrentChatId);
+        }
+      } catch (e) {
+        console.error('Gagal memuat chat dari localStorage:', e);
+      }
+    }
+
+    // Fungsi untuk menyesuaikan tinggi textarea
+    function adjustTextareaHeight() {
+      chatInput.style.height = 'auto';
+      chatInput.style.height = Math.min(chatInput.scrollHeight, 200) + 'px';
+    }
+
+    // Event Listeners
+    sendButton.addEventListener('click', processMessage);
+
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        processMessage();
+      }
+    });
+
+    chatInput.addEventListener('input', adjustTextareaHeight);
+
+    newChatBtn.addEventListener('click', createNewChat);
+
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+    });
+
+    // Tutup sidebar saat klik di luar (untuk mobile)
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768 &&
+        !sidebar.contains(e.target) &&
+        !menuToggle.contains(e.target)) {
+        sidebar.classList.remove('open');
+      }
+    });
+
+    // Inisialisasi
+    function init() {
+      // Muat chat dari localStorage
+      loadChatsFromStorage();
+
+      // Perbarui UI
+      updateHistoryList();
+      switchChat(currentChatId);
+
+      // Fokus ke input
+      chatInput.focus();
+
+      // Simpan chat ke localStorage secara berkala
+      setInterval(saveChatsToStorage, 30000);
+
+      // Pastikan textarea tidak memiliki scroll horizontal
+      chatInput.addEventListener('input', function () {
+        this.style.overflowX = 'hidden';
+      });
+    }
+
+    // Jalankan inisialisasi saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', init);
+
+    // Tambahkan handler untuk mencegah pengiriman formulir
+    document.addEventListener('submit', (e) => {
+      e.preventDefault();
+    });
+
+    // Ambil tombol back
+    const backBtn = document.getElementById('backBtn');
+
+    // Tambahkan event listener
+    backBtn.addEventListener('click', () => {
+      window.history.back(); // kembali ke halaman sebelumnya
+    });
+  </script>
+</body>
+
+</html>

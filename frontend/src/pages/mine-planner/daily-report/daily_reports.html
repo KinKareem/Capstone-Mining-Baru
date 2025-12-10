@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Reports - Mine Planner</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../../style/styles.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0 sidebar">
+                <div class="p-3">
+                    <div class="text-center mb-4">
+                        <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center"
+                            style="width:80px;height:80px;overflow:hidden;">
+                            <img src="/assets/mine-planner-image/mine-planner-profile.png" alt="profile"
+                                style="width:100%;height:100%;object-fit:cover;" />
+                        </div>
+
+                        <h5 class="mt-2 mb-0">Nino</h5>
+                        <small class="text-light">Mine Planner</small>
+                    </div>
+
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="../home/home_planner_page.html">
+                            <i class="bi bi-book me-2"></i> Dashboard
+                        </a>
+                        <a class="nav-link" href="../target_production/mine_plan/mining_plan.html">
+                            <i class="bi bi-cpu me-2"></i> Ai Plan Create
+                        </a>
+                        <a class="nav-link" href="../weekly_periods/weekly_periods.html">
+                            <i class="bi bi-calendar-week me-2"></i> Weekly Periods
+                        </a>
+                        <a class="nav-link" href="../employees/employees.html">
+                            <i class="bi bi-people me-2"></i> Employees
+                        </a>
+                        <a class="nav-link" href="../equipment/equipment.html">
+                            <i class="bi bi-truck me-2"></i> Equipment
+                        </a>
+                        <a class="nav-link" href="../weekly-schedule/weekly_schedule.html">
+                            <i class="bi bi-calendar-check me-2"></i> Schedule
+                        </a>
+                        <a class="nav-link active" href="daily_reports.html">
+                            <i class="bi bi-clipboard-data me-2"></i> Daily Reports
+                        </a>
+                        <a class="nav-link " href="../daily-attendance/daily_attendance.html">
+                            <i class="bi bi-clipboard-check me-2"></i> Daily Attendance
+                        </a>
+                        <a class="nav-link" href="../daily-equipment-status/daily_equipment_status.html">
+                            <i class="bi bi-tools me-2"></i> Equipment Status
+                        </a>
+                        <a class="nav-link" href="../ai_agent/ai_agent_mining.html">
+                            <i class="bi bi-chat me-2"></i> Free Chat
+                        </a>
+                    </nav>
+
+                    <div class="mt-4 pt-4 border-top">
+                        <button class="btn btn-outline-light w-100" id="logout-btn">
+                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 content-wrapper">
+                <!-- Header -->
+                <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+                    <div class="container-fluid">
+                        <h2 class="navbar-brand mb-0">
+                            <i class="bi bi-clipboard-data text-primary"></i> Daily Production Reports
+                        </h2>
+                        <div class="d-flex align-items-center">
+                            <span class="me-3 text-muted">
+                                <i class="bi bi-clock me-1"></i>
+                                <span id="current-time">--:--:--</span>
+                            </span>
+                        </div>
+                    </div>
+                </nav>
+
+                <!-- Main Content -->
+                <main class="p-4" id="main-content">
+                    <div class="container-fluid">
+                        <!-- Page Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h4 class="mb-1">Daily Production Monitoring</h4>
+                                <p class="text-muted mb-0">Track daily tonnage, attendance, and equipment status</p>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addReportModal">
+                                    <i class="bi bi-plus-circle me-1"></i> Add Report
+                                </button>
+                                <button class="btn btn-success" id="auto-generate-btn">
+                                    <i class="bi bi-magic me-1"></i> Auto Generate Today
+                                </button>
+                                <button class="btn btn-outline-secondary" id="refresh-btn">
+                                    <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Stats Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card card-stat bg-primary text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-2">Today's Tonnage</h6>
+                                                <h3 class="card-title mb-0" id="today-tonnage">0 tons</h3>
+                                                <small class="opacity-75">Target: <span id="today-target">0
+                                                        tons</span></small>
+                                            </div>
+                                            <i class="bi bi-bar-chart fs-1 opacity-50"></i>
+                                        </div>
+                                        <div class="progress mt-2 bg-white bg-opacity-25">
+                                            <div class="progress-bar" id="tonnage-progress" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card card-stat bg-success text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-2">Active Employees</h6>
+                                                <h3 class="card-title mb-0" id="active-employees">0</h3>
+                                                <small class="opacity-75">Present today</small>
+                                            </div>
+                                            <i class="bi bi-people fs-1 opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card card-stat bg-warning text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-2">Equipment Ready</h6>
+                                                <h3 class="card-title mb-0" id="ready-equipment">0</h3>
+                                                <small class="opacity-75">Operational today</small>
+                                            </div>
+                                            <i class="bi bi-truck fs-1 opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card card-stat bg-info text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-2">Monthly Total</h6>
+                                                <h5 class="card-title mb-0" id="monthly-total">0 tons</h5>
+                                                <small class="opacity-75">This month</small>
+                                            </div>
+                                            <i class="bi bi-calendar-month fs-1 opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Summary Row -->
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="bi bi-graph-up me-2"></i> Production Trend (Last 7 Days)
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="productionChart" height="200"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="bi bi-info-circle me-2"></i> Today's Summary
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3 summary-card tonnage">
+                                            <h6 class="mb-1">Daily Production</h6>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h4 id="summary-tonnage" class="mb-0">0 tons</h4>
+                                                <span class="badge bg-success" id="summary-achievement">0%</span>
+                                            </div>
+                                            <small class="text-muted">vs Target</small>
+                                        </div>
+                                        <div class="mb-3 summary-card attendance">
+                                            <h6 class="mb-1">Workforce</h6>
+                                            <h4 id="summary-attendance" class="mb-0">0 employees</h4>
+                                            <small class="text-muted">Present today</small>
+                                        </div>
+                                        <div class="mb-3 summary-card equipment">
+                                            <h6 class="mb-1">Equipment Status</h6>
+                                            <h4 id="summary-equipment" class="mb-0">0 units</h4>
+                                            <small class="text-muted">Ready for operation</small>
+                                        </div>
+                                        <div class="mt-3">
+                                            <button class="btn btn-outline-primary w-100" id="update-summary-btn">
+                                                <i class="bi bi-arrow-clockwise me-1"></i> Update Summary
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Daily Reports Table -->
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-table me-2"></i> Daily Reports
+                                </h5>
+                                <div class="d-flex align-items-center">
+                                    <input type="date" class="form-control form-control-sm me-2" id="date-filter"
+                                        style="width: 150px;">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                            data-bs-toggle="dropdown">
+                                            <i class="bi bi-download me-1"></i> Export
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#" onclick="exportReports('pdf')">PDF</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="reports-table">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Period</th>
+                                                <th>Tonnage</th>
+                                                <th>Employees</th>
+                                                <th>Equipment</th>
+                                                <th>Achievement</th>
+                                                <th>Notes</th>
+                                                <th class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="reports-table-body">
+                                            <!-- Data will be loaded here -->
+                                            <tr>
+                                                <td colspan="8" class="text-center py-5">
+                                                    <div class="spinner-border text-primary" role="status">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                    <p class="mt-2 text-muted">Loading daily reports...</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Report Modal -->
+    <div class="modal fade" id="addReportModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-plus-circle me-2"></i> Add Daily Report
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addReportForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Date *</label>
+                                <input type="date" class="form-control" id="report_date" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Active Period</label>
+                                <div id="period_display">
+                                    <div class="alert alert-secondary mb-0">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        Select a date to see active period
+                                    </div>
+                                </div>
+                                <input type="hidden" id="period_id">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Daily Tonnage (tons) *</label>
+                                <input type="number" class="form-control" id="daily_tonnage" min="0" step="0.1"
+                                    required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Employees Present *</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="total_employees_present" min="0"
+                                        required>
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        onclick="fetchAttendanceCount()">
+                                        <i class="bi bi-calculator"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Equipment Ready *</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="total_equipment_ready" min="0"
+                                        required>
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        onclick="fetchEquipmentCount()">
+                                        <i class="bi bi-calculator"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" rows="3"
+                                placeholder="Additional notes, issues, or observations..."></textarea>
+                        </div>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Use calculator buttons to fetch actual counts from attendance and equipment records.
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="btn-save-report">
+                        <i class="bi bi-save me-1"></i> Save Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Report Modal -->
+    <div class="modal fade" id="editReportModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-pencil-square me-2"></i> Edit Daily Report
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editReportForm">
+                        <input type="hidden" id="edit_report_id">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Date *</label>
+                                <input type="date" class="form-control" id="edit_report_date" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Active Period</label>
+                                <div id="edit_period_display">
+                                    <div class="alert alert-secondary mb-0">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        Select a date to see active period
+                                    </div>
+                                </div>
+                                <input type="hidden" id="edit_period_id">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Daily Tonnage (tons) *</label>
+                                <input type="number" class="form-control" id="edit_daily_tonnage" min="0" step="0.1"
+                                    required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Employees Present *</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="edit_total_employees_present" min="0"
+                                        required>
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        onclick="fetchAttendanceCount(true)">
+                                        <i class="bi bi-calculator"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Equipment Ready *</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="edit_total_equipment_ready" min="0"
+                                        required>
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        onclick="fetchEquipmentCount(true)">
+                                        <i class="bi bi-calculator"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-control" id="edit_notes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="btn-update-report">
+                        <i class="bi bi-save me-1"></i> Update Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Details Modal -->
+    <div class="modal fade" id="viewDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-eye me-2"></i> Report Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-subtitle mb-2 text-muted">Date</h6>
+                                    <h4 class="card-title" id="detail-date">-</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-subtitle mb-2 text-muted">Period</h6>
+                                    <h4 class="card-title" id="detail-period">-</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-subtitle mb-2 text-muted">Tonnage</h6>
+                                    <h4 class="card-title" id="detail-tonnage">0 tons</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-subtitle mb-2 text-muted">Achievement</h6>
+                                    <h4 class="card-title" id="detail-achievement">0%</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">
+                                        <i class="bi bi-people me-2"></i> Employee Attendance
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h4 id="detail-employees">0 employees</h4>
+                                        <span class="badge bg-success">Present</span>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Employee</th>
+                                                    <th>Position</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="attendance-details">
+                                                <!-- Attendance details will be loaded here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">
+                                        <i class="bi bi-truck me-2"></i> Equipment Status
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h4 id="detail-equipment">0 units</h4>
+                                        <span class="badge bg-success">Ready</span>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Unit Code</th>
+                                                    <th>Type</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="equipment-details">
+                                                <!-- Equipment details will be loaded here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">
+                                        <i class="bi bi-chat-text me-2"></i> Notes
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <p id="detail-notes" class="mb-0">No notes available.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btn-print-details">
+                        <i class="bi bi-printer me-1"></i> Print Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="position-fixed bottom-0 end-0 m-4">
+        <button class="btn btn-primary rounded-circle d-flex
+                        align-items-center justify-content-center shadow" style="width:48px;height:48px;">
+            <i class="bi bi-robot fs-5"></i>
+        </button>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script type="module" src="./daily_reports.js"></script>
+</body>
+
+</html>

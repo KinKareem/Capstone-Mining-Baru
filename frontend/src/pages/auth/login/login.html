@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Planner Portal</title>
+  <link rel="stylesheet" href="../../../style/style.css" />
+  <script type="module" src="/src/pages/auth/login/login.js"></script>
+</head>
+
+<body class="center-screen">
+  <a href="../../../../index.html" class="back-menu">Back</a>
+  <div class="container auth-form-container">
+    <h1 id="page-title" class="title">Login</h1>
+    <hr class="line">
+
+    <!-- Form Login -->
+    <form id="login-form">
+      <div id="login-message" class="message"></div>
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required />
+
+      <button type="submit" class="btn btn-primary">Masuk</button>
+    </form>
+    <p class="mt-2">
+      Belum punya akun?
+      <a id="register-link" href="../register/register.html">Daftar di sini</a>
+    </p>
+  </div>
+</body>
+
+</html>

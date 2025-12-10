@@ -1,0 +1,87 @@
+$primary: #3b82f6;
+$primary-dark: #2563eb;
+$text: #1f2937;
+$muted: #6b7280;
+$border: #e5e7eb;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #f3f4f6;
+}
+
+.sidebar {
+  background: #1f2937;
+  color: white;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .nav {
+    .nav-link {
+      color: #cbd5e1;
+      border-radius: 8px;
+      padding: 8px 12px;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+      }
+      &.active {
+        background-color: #334155;
+        color: #ffffff;
+      }
+    }
+  }
+}
+
+.menu-card {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  color: $text;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.menu-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid $border;
+}
+
+.floating-chat {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: $primary;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  transition: all 0.2s ease;
+  z-index: 999;
+  font-weight: 600;
+}
+.floating-chat:hover {
+  background: $primary-dark;
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+}

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Mining Optimization - Mine Planner</title>
+  <link rel="stylesheet" href="../../../style/mine-planner/style.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script type="module" src="../target_production/target_production.js"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <aside
+        class="sidebar col-2 col-xl-2 bg-body-tertiary border-end min-vh-100 d-flex flex-column align-items-center py-4">
+        <div class="card w-100 text-center border-0 bg-transparent mb-3">
+          <div class="card-body">
+            <img src="../../../../public/assets/mine-planner-image/mine-planner-profile.png" alt="profile"
+              class="img-fluid rounded-circle border border-3 mb-3"
+              style="width: 96px; height: 96px; object-fit: cover" />
+            <h3 class="fs-5 fw-bold mb-0">Nino</h3>
+            <p class="text-muted mb-0">Mine Planner</p>
+          </div>
+        </div>
+        <nav class="w-100 mb-3">
+          <ul class="nav nav-pills flex-column w-100">
+            <li class="nav-item">
+              <a class="nav-link" href="../home/home_planner_page.html"><i class="bi bi-clipboard-data"></i>
+                Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#"><i class="bi bi-cpu"></i> AI Mining
+                Optimization</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false"><i
+                  class="bi bi-database"></i> Database</a>
+              <ul class="dropdown-menu w-100">
+                <li>
+                  <a class="dropdown-item" href="../crew/crew_management_page.html"><i class="bi bi-people"></i>
+                    Informasi Karyawan</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="../equipment/equipment.html"><i class="bi bi-truck"></i> Ketersediaan &
+                    Status Alat
+                    Berat</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="../pit/pit.html"><i class="bi bi-diagram-3"></i> Manajemen Lokasi
+                    Tambang
+                    (Pit)</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="../target_production/target_production.html"><i
+                      class="bi bi-graph-up"></i> Rencana Produksi &
+                    Blending</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="openChatMine"><i class="bi bi-chat-dots"></i> Free Chat</a>
+            </li>
+          </ul>
+        </nav>
+        <div class="logout-container w-100 mt-auto px-2">
+          <button class="btn btn-danger w-100" id="logout-btn">
+            Keluar (Logout)
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content col">
+        <h1 style="font-size: 30px; font-weight: 700; color: #1f2937">
+          AI Mining Optimization
+        </h1>
+        <p class="text-sm text-gray-600 mb-6">
+          Halaman ini menampilkan workflow AI untuk rencana produksi dan
+          blending.
+        </p>
+
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-700">
+            Daftar Rencana Blending
+          </h2>
+          <button id="add-new-btn" class="btn-sidebar btn-primary">
+            + Tambah Rencana Baru
+          </button>
+        </div>
+
+        <div id="production-table-body" style="display: none"></div>
+      </main>
+    </div>
+  </div>
+
+  <button class="btn btn-primary rounded-circle shadow position-fixed bottom-0 end-0 m-3 floating-chat" id="chatToggle"
+    aria-label="Buka Chatbot" onclick="alert('Chatbot AI Aktif')">
+    <i class="bi bi-chat-dots"></i>
+  </button>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="../../utils/logout.js"></script>
+  <script type="module">
+    import { BASE_URL } from "../../utils/config.js";
+    window.__BASE_URL = BASE_URL;
+  </script>
+  <script>
+    document
+      .getElementById("openChatMine")
+      ?.addEventListener("click", function (e) {
+        e.preventDefault();
+        document.getElementById("chatToggle")?.click();
+      });
+
+    const N8N_WEBHOOK =
+      "https://pojer26018.app.n8n.cloud/webhook-test/summary";
+
+    document
+      .getElementById("add-new-btn")
+      .addEventListener("click", async () => {
+        Swal.fire({
+          title: "⏳ AI Sedang Memproses",
+          text: "Mohon tunggu...",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        try {
+          await fetch(N8N_WEBHOOK, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ update_summary: false }),
+          });
+          const start = Date.now();
+          const checkUrl =
+            (window.__BASE_URL || "http://localhost:3000") +
+            "/ai_summary/ai_summary";
+          let done = false;
+          while (!done) {
+            try {
+              const r = await fetch(checkUrl, { cache: "no-store" });
+              if (r.ok) {
+                const j = await r.json();
+                if (j && j.data) {
+                  done = true;
+                  break;
+                }
+              }
+            } catch { }
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            if (Date.now() - start > 300000) break;
+          }
+          Swal.close();
+          window.location.href =
+            "../target_production/mine_plan/mining_plan.html";
+        } catch (err) {
+          Swal.fire("Gagal!", "Tidak dapat memproses AI Summary", "error");
+        }
+      });
+  </script>
+</body>
+
+</html>

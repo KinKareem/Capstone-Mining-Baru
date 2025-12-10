@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Mine Planner</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../../style/styles.css">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+        }
+
+        .sidebar .nav-link {
+            color: #ecf0f1;
+            padding: 0.8rem 1rem;
+            margin: 0.2rem 0;
+            border-radius: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .sidebar .nav-link.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .content-wrapper {
+            background-color: #f8f9fa;
+        }
+
+        .card-stat {
+            border: none;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+
+        .card-stat:hover {
+            transform: translateY(-5px);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .legend-swatch {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            margin-right: 0.5rem;
+        }
+
+        .progress-bar-custom {
+            background-color: #3498db;
+        }
+
+        .weather-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .table-responsive {
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0 sidebar">
+                <div class="p-3">
+                    <div class="text-center mb-4">
+                        <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center"
+                            style="width:80px;height:80px;overflow:hidden;">
+                            <img src="/assets/mine-planner-image/mine-planner-profile.png" alt="profile"
+                                style="width:100%;height:100%;object-fit:cover;" />
+                        </div>
+
+                        <h5 class="mt-2 mb-0">Nino</h5>
+                        <small class="text-light">Mine Planner</small>
+                    </div>
+
+                    <nav class="nav flex-column">
+                        <a class="nav-link active" href="home_planner_page.html">
+                            <i class="bi bi-book me-2"></i> Dashboard
+                        </a>
+                        <a class="nav-link" href="../target_production/mine_plan/mining_plan.html">
+                            <i class="bi bi-cpu me-2"></i> Ai Plan Create
+                        </a>
+                        <a class="nav-link" href="../weekly_periods/weekly_periods.html">
+                            <i class="bi bi-calendar-week me-2"></i> Weekly Periods
+                        </a>
+                        <a class="nav-link" href="../employees/employees.html">
+                            <i class="bi bi-people me-2"></i> Employees
+                        </a>
+                        <a class="nav-link" href="../equipment/equipment.html">
+                            <i class="bi bi-truck me-2"></i> Equipment
+                        </a>
+                        <a class="nav-link" href="../weekly-schedule/weekly_schedule.html">
+                            <i class="bi bi-calendar-check me-2"></i> Schedule
+                        </a>
+                        <a class="nav-link" href="../daily-report/daily_reports.html">
+                            <i class="bi bi-clipboard-data me-2"></i> Daily Reports
+                        </a>
+                        <a class="nav-link" href="../daily-attendance/daily_attendance.html">
+                            <i class="bi bi-clipboard-check me-2"></i> Daily Attendance
+                        </a>
+                        <a class="nav-link" href="../daily-equipment-status/daily_equipment_status.html">
+                            <i class="bi bi-tools me-2"></i> Equipment Status
+                        </a>
+                        <a class="nav-link" href="../ai_agent/ai_agent_mining.html">
+                            <i class="bi bi-chat me-2"></i> Free Chat
+                        </a>
+                    </nav>
+
+                    <div class="mt-4 pt-4 border-top">
+                        <button class="btn btn-outline-light w-100" id="logout-btn">
+                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 content-wrapper">
+                <!-- Header -->
+                <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+                    <div class="container-fluid">
+                        <h2 class="navbar-brand mb-0">
+                            <i class="bi bi-book text-primary"></i> Mine Planner Dashboard
+                        </h2>
+                        <div class="d-flex align-items-center">
+                            <span class="me-3 text-muted">
+                                <i class="bi bi-clock me-1"></i>
+                                <span id="current-time">--:--:--</span>
+                            </span>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                                    data-bs-toggle="dropdown">
+                                    <i class="bi bi-bell"></i>
+                                    <span class="badge bg-danger">3</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#">New equipment added</a></li>
+                                    <li><a class="dropdown-item" href="#">Maintenance due</a></li>
+                                    <li><a class="dropdown-item" href="#">Breakdown reported</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+
+                <!-- Main Content -->
+                <main class="p-4" id="main-content">
+                    <div class="container-fluid">
+                        <!-- Page Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h4 class="mb-1">Mine Operations Overview</h4>
+                                <p class="text-muted mb-0">Monitoring and Key Performance Indicators</p>
+                            </div>
+                        </div>
+
+                        <!-- KPI Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card card-stat bg-primary text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-2">Daily Tonnage</h6>
+                                                <h3 class="card-title mb-0" id="kpiTonnageToday">0</h3>
+                                            </div>
+                                            <i class="bi bi-graph-up fs-1 opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card card-stat bg-success text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-2">Equipment Ready</h6>
+                                                <div class="progress mb-2" style="height: 6px;">
+                                                    <div class="progress-bar progress-bar-custom" role="progressbar"
+                                                        id="kpiEquipmentReadyBar" style="width: 0%" aria-valuenow="0"
+                                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                                <small id="kpiEquipmentReadyText">0 / 0</small>
+                                            </div>
+                                            <i class="bi bi-check-circle fs-1 opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card card-stat bg-warning text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-2">Employee Attendance</h6>
+                                                <div class="progress mb-2" style="height: 6px;">
+                                                    <div class="progress-bar progress-bar-custom" role="progressbar"
+                                                        id="kpiAttendanceBar" style="width: 0%" aria-valuenow="0"
+                                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                                <small id="kpiAttendanceText">0 / 0</small>
+                                            </div>
+                                            <i class="bi bi-people fs-1 opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card card-stat bg-info text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-2">Weekly Progress</h6>
+                                                <div class="progress mb-2" style="height: 6px;">
+                                                    <div class="progress-bar progress-bar-custom" role="progressbar"
+                                                        id="kpiWeeklyProgressBar" style="width: 0%" aria-valuenow="0"
+                                                        aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                                <small id="kpiWeeklyProgressText">0 / 0 Ton</small>
+                                            </div>
+                                            <i class="bi bi-bar-chart fs-1 opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Row -->
+                        <div class="row mb-4">
+                            <div class="col-lg-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="bi bi-graph-up me-2"></i> Daily Production Trend (30 Days)
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="dailyTrendChart" width="400" height="300"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="bi bi-pie-chart me-2"></i> Equipment Status Distribution
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <div class="chart-container">
+                                                    <canvas id="equipmentStatusChart" width="300" height="300"></canvas>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div id="equipmentStatusLegend"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Second Charts Row -->
+                        <div class="row mb-4">
+                            <div class="col-lg-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="bi bi-bar-chart me-2"></i> Equipment Production Breakdown (7 Days)
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="equipmentBreakdownChart" width="400" height="300"></canvas>
+                                        </div>
+                                        <div id="equipmentBreakdownLegend" class="mt-3 d-flex flex-wrap"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="bi bi-calendar-check me-2"></i> Attendance Trend (14 Days)
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="attendanceStackedChart" width="400" height="300"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Weather Card and Tables -->
+                        <div class="row mb-4">
+                            <div class="col-lg-4 mb-4">
+                                <div class="card weather-card text-white">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="bi bi-cloud-sun me-2"></i> Today's Weather
+                                        </h5>
+                                        <div id="weatherCard">
+                                            <p id="weatherSummary" class="mb-2">Loading weather data...</p>
+                                            <small id="weatherMeta">Fetching conditions...</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-8 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="bi bi-table me-2"></i> Recent Attendance Details
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover" id="attendanceDetailTable">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Date</th>
+                                                        <th>Status</th>
+                                                        <th>Remarks</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td colspan="4" class="text-center py-4">
+                                                            <div class="spinner-border text-primary" role="status">
+                                                                <span class="visually-hidden">Loading...</span>
+                                                            </div>
+                                                            <p class="mt-2 text-muted">Loading attendance data...</p>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Weekly Schedule Table -->
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-calendar-week me-2"></i> Weekly Schedule Overview
+                                </h5>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="weeklyPrev">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="weeklyNext">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="weeklyScheduleTable">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Employee</th>
+                                                <th>Equipment</th>
+                                                <th>Shift</th>
+                                                <th>Location</th>
+                                                <th>Notes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="6" class="text-center py-4">
+                                                    <div class="spinner-border text-primary" role="status">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                    <p class="mt-2 text-muted">Loading schedule data...</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Dashboard JavaScript -->
+    <script type="module" src="./dashboard.js"></script>
+    <!-- Logout Script -->
+    <script type="module" src="../../../pages/utils/logout.js"></script>
+    <!-- Current Time Script -->
+    <script>
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('id-ID', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('current-time').textContent = timeString;
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        document.getElementById('logout-btn')?.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to logout?')) {
+                // Tambahkan kode logout di sini
+                console.log('Logging out...');
+                // Contoh: window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+
+</html>

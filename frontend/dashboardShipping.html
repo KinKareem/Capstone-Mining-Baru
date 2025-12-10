@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard — Planner Portal</title>
+    <script>
+      (function () {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          window.location.replace("/login.html");
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <main class="container" role="main">
+      <h1 class="title">Dashboard</h1>
+      <p>
+        Muantab rek udh bisa. Ini adalah halaman Shipping
+      </p>
+      <button class="btn" onclick="localStorage.clear(); location.href='/'">
+        Logout
+      </button>
+    </main>
+  </body>
+</html>
