@@ -36,7 +36,7 @@ async function deletePlanApi(id) {
       const errorBody = await response.json().catch(() => ({}));
       throw new Error(
         errorBody.message ||
-          `Gagal menghapus Rencana ID ${id}. Status: ${response.status}`
+        `Gagal menghapus Rencana ID ${id}. Status: ${response.status}`
       );
     }
     return true;
@@ -74,23 +74,21 @@ async function renderProductionTable() {
             <td class="py-2 px-4 border-b">${plan.plan_week}</td>
             <td class="py-2 px-4 border-b">${plan.plan_year}</td>
             <td class="py-2 px-4 border-b">${plan.target_tonnage_weekly.toLocaleString(
-              "id-ID"
-            )}</td>
+      "id-ID"
+    )}</td>
             <td class="py-2 px-4 border-b">${plan.target_calori} kcal/kg</td>
             <td class="py-2 px-4 border-b">${plan.target_ash_max} %</td>
             <td class="py-2 px-4 border-b">${getApprovalBadge(
-              plan.is_approved_mine
-            )}</td>
+      plan.is_approved_mine
+    )}</td>
             <td class="py-2 px-4 border-b">${getApprovalBadge(
-              plan.is_approved_shipping
-            )}</td>
+      plan.is_approved_shipping
+    )}</td>
             <td class="py-2 px-4 border-b text-right action-buttons">
-                <button onclick="window.handleEdit(${
-                  plan.id
-                })" class="text-blue-600 hover:text-blue-800 text-sm btn-edit">Edit</button>
-                <button onclick="window.handleDelete(${
-                  plan.id
-                })" class="text-red-600 hover:text-red-800 text-sm btn-hapus">Hapus</button>
+                <button onclick="window.handleEdit(${plan.id
+      })" class="text-blue-600 hover:text-blue-800 text-sm btn-edit">Edit</button>
+                <button onclick="window.handleDelete(${plan.id
+      })" class="text-red-600 hover:text-red-800 text-sm btn-hapus">Hapus</button>
             </td>
         `;
     tableBody.appendChild(row);

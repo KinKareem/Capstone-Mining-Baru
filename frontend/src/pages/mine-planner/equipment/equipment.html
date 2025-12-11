@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,27 +11,25 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../../../style/styles.css">
 </head>
+
 <body>
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
             <div class="col-md-3 col-lg-2 px-0 sidebar">
                 <div class="p-3">
-                    
+
                     <div class="text-center mb-4">
                         <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center"
                             style="width:80px;height:80px;overflow:hidden;">
-                            <img
-                            src="/assets/mine-planner-image/mine-planner-profile.png"
-                            alt="profile"
-                            style="width:100%;height:100%;object-fit:cover;"
-                            />
+                            <img src="/assets/mine-planner-image/mine-planner-profile.png" alt="profile"
+                                style="width:100%;height:100%;object-fit:cover;" />
                         </div>
 
                         <h5 class="mt-2 mb-0">Nino</h5>
                         <small class="text-light">Mine Planner</small>
                     </div>
-                    
+
                     <nav class="nav flex-column">
                         <a class="nav-link" href="../home/home_planner_page.html">
                             <i class="bi bi-book me-2"></i> Dashboard
@@ -59,11 +58,11 @@
                         <a class="nav-link" href="../daily-equipment-status/daily_equipment_status.html">
                             <i class="bi bi-tools me-2"></i> Equipment Status
                         </a>
-                        <a class="nav-link" href="settings.html">
-                            <i class="bi bi-gear me-2"></i> Settings
+                        <a class="nav-link" href="../ai_agent/ai_agent_mining.html">
+                            <i class="bi bi-chat me-2"></i> Free Chat
                         </a>
                     </nav>
-                    
+
                     <div class="mt-4 pt-4 border-top">
                         <button class="btn btn-outline-light w-100" id="logout-btn">
                             <i class="bi bi-box-arrow-right me-2"></i> Logout
@@ -71,7 +70,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 content-wrapper">
                 <!-- Header -->
@@ -85,11 +84,11 @@
                                 <i class="bi bi-clock me-1"></i>
                                 <span id="current-time">--:--:--</span>
                             </span>
-                            
+
                         </div>
                     </div>
                 </nav>
-                
+
                 <!-- Main Content -->
                 <main class="p-4" id="main-content">
                     <div class="container-fluid">
@@ -100,7 +99,8 @@
                                 <p class="text-muted mb-0">Manage all heavy equipment units and their status</p>
                             </div>
                             <div class="d-flex gap-2">
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEquipmentModal">
+                                <button class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#addEquipmentModal">
                                     <i class="bi bi-plus-circle me-1"></i> Add New Equipment
                                 </button>
                             </div>
@@ -218,8 +218,7 @@
                     <form id="addEquipmentForm">
                         <div class="mb-3">
                             <label class="form-label">Unit Code *</label>
-                            <input type="text" class="form-control" id="unit_code" 
-                                   placeholder="e.g., EX-001" required>
+                            <input type="text" class="form-control" id="unit_code" placeholder="e.g., EX-001" required>
                             <div class="form-text">Unique identifier for this equipment</div>
                         </div>
                         <div class="row">
@@ -245,19 +244,18 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Capacity</label>
-                                <input type="number" class="form-control" id="capacity" 
-                                       min="0" step="0.1" placeholder="0">
+                                <input type="number" class="form-control" id="capacity" min="0" step="0.1"
+                                    placeholder="0">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Capacity Unit</label>
-                                <input type="text" class="form-control" id="capacity_unit" 
-                                       placeholder="tons" value="tons">
+                                <input type="text" class="form-control" id="capacity_unit" placeholder="tons"
+                                    value="tons">
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Model (Optional)</label>
-                            <input type="text" class="form-control" id="model" 
-                                   placeholder="e.g., Caterpillar 797F">
+                            <input type="text" class="form-control" id="model" placeholder="e.g., Caterpillar 797F">
                         </div>
                     </form>
                 </div>
@@ -309,19 +307,17 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Capacity</label>
-                                <input type="number" class="form-control" id="edit_capacity" 
-                                       min="0" step="0.1">
+                                <input type="number" class="form-control" id="edit_capacity" min="0" step="0.1">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Capacity Unit</label>
-                                <input type="text" class="form-control" id="edit_capacity_unit" 
-                                       placeholder="tons">
+                                <input type="text" class="form-control" id="edit_capacity_unit" placeholder="tons">
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Model (Optional)</label>
-                            <input type="text" class="form-control" id="edit_model" 
-                                   placeholder="e.g., Caterpillar 797F">
+                            <input type="text" class="form-control" id="edit_model"
+                                placeholder="e.g., Caterpillar 797F">
                         </div>
                     </form>
                 </div>
@@ -335,8 +331,7 @@
 
     <div class="position-fixed bottom-0 end-0 m-4">
         <button class="btn btn-primary rounded-circle d-flex
-                        align-items-center justify-content-center shadow"
-                style="width:48px;height:48px;">
+                        align-items-center justify-content-center shadow" style="width:48px;height:48px;">
             <i class="bi bi-robot fs-5"></i>
         </button>
     </div>
@@ -348,4 +343,5 @@
     <!-- Equipment JavaScript -->
     <script src="equipment.js"></script>
 </body>
+
 </html>
