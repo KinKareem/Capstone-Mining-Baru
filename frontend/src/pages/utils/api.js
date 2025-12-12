@@ -1,6 +1,6 @@
 const API_BASE =
   import.meta.env.VITE_API_BASE || "http://localhost:3000/api/auth";
-import { BASE_URL } from "./config";
+import { BASE_URL, API_BASE_URL } from "./config";
 import { getAccessToken } from "./auth";
 
 export async function postAuth(endpoint, data) {
@@ -44,17 +44,18 @@ ENDPOINTS.WEEKLY_PLAN_DETAIL = (id) => `${BASE_URL}/weekly-plans/${id}`;
 ENDPOINTS.WEEKLY_PLAN_GENERATE = `${BASE_URL}/weekly-plans/generate-next`;
 
 // EQUIPMENT API
-ENDPOINTS.EQUIPMENT_LIST = `${BASE_URL}/equipments`;
-ENDPOINTS.EQUIPMENT_DETAIL = (id) => `${BASE_URL}/equipments/${id}`;
+ENDPOINTS.EQUIPMENT_LIST = `${API_BASE_URL}/equipments`;
+ENDPOINTS.EQUIPMENT_DETAIL = (id) => `${API_BASE_URL}/equipments/${id}`;
 
 // EMPLOYEES API
-ENDPOINTS.EMPLOYEES_LIST = `${BASE_URL}/employees`;
-ENDPOINTS.EMPLOYEES_DETAIL = (id) => `${BASE_URL}/employees/${id}`;
+ENDPOINTS.EMPLOYEES_LIST = `${API_BASE_URL}/employees`;
+ENDPOINTS.EMPLOYEES_DETAIL = (id) => `${API_BASE_URL}/employees/${id}`;
 
 // WEEKLY SCHEDULE API
-ENDPOINTS.WEEKLY_SCHEDULE_LIST = `${BASE_URL}/weekly-schedules`;
-ENDPOINTS.WEEKLY_SCHEDULE_DETAIL = (id) => `${BASE_URL}/weekly-schedules/${id}`;
-ENDPOINTS.WEEKLY_SCHEDULE_DROPDOWNS = `${BASE_URL}/weekly-schedules/dropdowns`;
+ENDPOINTS.WEEKLY_SCHEDULE_LIST = `${API_BASE_URL}/weekly-schedules`;
+ENDPOINTS.WEEKLY_SCHEDULE_DETAIL = (id) =>
+  `${API_BASE_URL}/weekly-schedules/${id}`;
+ENDPOINTS.WEEKLY_SCHEDULE_DROPDOWNS = `${API_BASE_URL}/weekly-schedules/dropdowns`;
 
 // DAILY REPORT API
 ENDPOINTS.DAILY_REPORT_STATS = `${BASE_URL}/daily-reports/stats`;
@@ -72,7 +73,6 @@ ENDPOINTS.DAILY_REPORT_CURRENT_PERIOD = `${BASE_URL}/daily-reports/current-perio
 ENDPOINTS.DAILY_ATTENDANCE = `${BASE_URL}/daily-attendance`;
 ENDPOINTS.DAILY_ATTENDANCE_SUMMARY = `${BASE_URL}/daily-attendance/summary`;
 ENDPOINTS.DAILY_ATTENDANCE = `${BASE_URL}/daily-attendance`;
-
 
 export async function getCrewData() {
   const accessToken = getAccessToken();
@@ -177,7 +177,7 @@ export async function getAllDailyReports() {
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
   const json = await res.json().catch(() => ({}));
-  
+
   return {
     ...json,
     ok: res.ok,
@@ -194,7 +194,7 @@ export async function getDailyReportDetail(id) {
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
   const json = await res.json().catch(() => ({}));
-  
+
   return {
     ...json,
     ok: res.ok,
@@ -216,11 +216,11 @@ export async function createDailyReport(payload) {
     body: JSON.stringify(payload),
   });
   const json = await res.json().catch(() => ({}));
-  
+
   if (!res.ok) {
     throw new Error(json.message || "Failed creating daily report");
   }
-  
+
   return json;
 }
 
@@ -238,11 +238,11 @@ export async function updateDailyReport(id, payload) {
     body: JSON.stringify(payload),
   });
   const json = await res.json().catch(() => ({}));
-  
+
   if (!res.ok) {
     throw new Error(json.message || "Failed updating daily report");
   }
-  
+
   return json;
 }
 
@@ -255,12 +255,12 @@ export async function deleteDailyReport(id) {
     method: "DELETE",
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
-  
+
   if (!res.ok) {
     const json = await res.json().catch(() => ({}));
     throw new Error(json.message || `Failed to delete daily report ${id}`);
   }
-  
+
   return { ok: true };
 }
 
@@ -269,20 +269,23 @@ export async function deleteDailyReport(id) {
  */
 export async function addDailyReportDetail(reportId, detail) {
   const accessToken = getAccessToken();
-  const res = await fetch(`${ENDPOINTS.DAILY_REPORT_DETAIL(reportId)}/details`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-    },
-    body: JSON.stringify(detail),
-  });
+  const res = await fetch(
+    `${ENDPOINTS.DAILY_REPORT_DETAIL(reportId)}/details`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+      },
+      body: JSON.stringify(detail),
+    }
+  );
   const json = await res.json().catch(() => ({}));
-  
+
   if (!res.ok) {
     throw new Error(json.message || "Failed adding equipment activity");
   }
-  
+
   return json;
 }
 
@@ -300,11 +303,11 @@ export async function updateDailyReportDetail(detailId, detail) {
     body: JSON.stringify(detail),
   });
   const json = await res.json().catch(() => ({}));
-  
+
   if (!res.ok) {
     throw new Error(json.message || "Failed updating equipment activity");
   }
-  
+
   return json;
 }
 
@@ -317,15 +320,16 @@ export async function deleteDailyReportDetail(detailId) {
     method: "DELETE",
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
-  
+
   if (!res.ok) {
     const json = await res.json().catch(() => ({}));
-    throw new Error(json.message || `Failed to delete equipment activity ${detailId}`);
+    throw new Error(
+      json.message || `Failed to delete equipment activity ${detailId}`
+    );
   }
-  
+
   return { ok: true };
 }
-
 
 /**
  * Menghasilkan laporan harian otomatis
@@ -333,15 +337,15 @@ export async function deleteDailyReportDetail(detailId) {
 export async function generateDailyReport(date) {
   const accessToken = getAccessToken();
   const res = await fetch(`${ENDPOINTS.DAILY_REPORT_LIST}/generate/${date}`, {
-    method: 'POST',
+    method: "POST",
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
   const json = await res.json().catch(() => ({}));
-  
+
   if (!res.ok) {
     throw new Error(json.message || "Failed to generate daily report");
   }
-  
+
   return json;
 }
 
@@ -392,11 +396,14 @@ export async function getCurrentPeriodInfo() {
  */
 export async function getAvailableEmployees(date) {
   const accessToken = getAccessToken();
-  const res = await fetch(`${BASE_URL}/daily-reports/${date}/available/employees`, {
-    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
-  });
+  const res = await fetch(
+    `${BASE_URL}/daily-reports/${date}/available/employees`,
+    {
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+    }
+  );
   const json = await res.json().catch(() => ({}));
-  
+
   return {
     ...json,
     ok: res.ok,
@@ -409,18 +416,20 @@ export async function getAvailableEmployees(date) {
  */
 export async function getAvailableEquipment(date) {
   const accessToken = getAccessToken();
-  const res = await fetch(`${BASE_URL}/daily-reports/${date}/available/equipment`, {
-    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
-  });
+  const res = await fetch(
+    `${BASE_URL}/daily-reports/${date}/available/equipment`,
+    {
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+    }
+  );
   const json = await res.json().catch(() => ({}));
-  
+
   return {
     ...json,
     ok: res.ok,
     status: res.status,
   };
 }
-
 
 /**
  * Mengambil semua equipment
@@ -431,7 +440,7 @@ export async function getAllEquipments() {
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
   const json = await res.json().catch(() => ({}));
-  
+
   return {
     ...json,
     ok: res.ok,
@@ -448,7 +457,7 @@ export async function getEquipmentDetail(id) {
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
   const json = await res.json().catch(() => ({}));
-  
+
   return {
     ...json,
     ok: res.ok,
@@ -470,11 +479,11 @@ export async function createEquipment(payload) {
     body: JSON.stringify(payload),
   });
   const json = await res.json().catch(() => ({}));
-  
+
   if (!res.ok) {
     throw new Error(json.message || "Failed creating equipment");
   }
-  
+
   return json;
 }
 
@@ -492,11 +501,11 @@ export async function updateEquipment(id, payload) {
     body: JSON.stringify(payload),
   });
   const json = await res.json().catch(() => ({}));
-  
+
   if (!res.ok) {
     throw new Error(json.message || "Failed updating equipment");
   }
-  
+
   return json;
 }
 
@@ -509,12 +518,12 @@ export async function deleteEquipment(id) {
     method: "DELETE",
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
-  
+
   if (!res.ok) {
     const json = await res.json().catch(() => ({}));
     throw new Error(json.message || `Failed to delete equipment ${id}`);
   }
-  
+
   return { ok: true };
 }
 
@@ -527,7 +536,7 @@ export async function getAllEmployees() {
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
   const json = await res.json().catch(() => ({}));
-  
+
   return {
     ...json,
     ok: res.ok,
@@ -544,7 +553,7 @@ export async function getEmployeeDetail(id) {
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
   const json = await res.json().catch(() => ({}));
-  
+
   return {
     ...json,
     ok: res.ok,
@@ -566,11 +575,11 @@ export async function createEmployee(payload) {
     body: JSON.stringify(payload),
   });
   const json = await res.json().catch(() => ({}));
-  
+
   if (!res.ok) {
     throw new Error(json.message || "Failed creating employee");
   }
-  
+
   return json;
 }
 
@@ -588,11 +597,11 @@ export async function updateEmployee(id, payload) {
     body: JSON.stringify(payload),
   });
   const json = await res.json().catch(() => ({}));
-  
+
   if (!res.ok) {
     throw new Error(json.message || "Failed updating employee");
   }
-  
+
   return json;
 }
 
@@ -605,12 +614,12 @@ export async function deleteEmployee(id) {
     method: "DELETE",
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
-  
+
   if (!res.ok) {
     const json = await res.json().catch(() => ({}));
     throw new Error(json.message || `Failed to delete employee ${id}`);
   }
-  
+
   return { ok: true };
 }
 
@@ -623,7 +632,7 @@ export async function getEmployeeStats() {
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
   const json = await res.json().catch(() => ({}));
-  
+
   return {
     ...json,
     ok: res.ok,
@@ -640,7 +649,7 @@ export async function getWeeklySchedules() {
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
   const json = await res.json().catch(() => ({}));
-  
+
   return {
     ...json,
     ok: res.ok,
@@ -657,7 +666,7 @@ export async function getWeeklyScheduleDetail(id) {
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
   const json = await res.json().catch(() => ({}));
-  
+
   return {
     ...json,
     ok: res.ok,
@@ -679,11 +688,11 @@ export async function createWeeklySchedule(payload) {
     body: JSON.stringify(payload),
   });
   const json = await res.json().catch(() => ({}));
-  
+
   if (!res.ok) {
     throw new Error(json.message || "Failed creating weekly schedule");
   }
-  
+
   return json;
 }
 
@@ -701,11 +710,11 @@ export async function updateWeeklySchedule(id, payload) {
     body: JSON.stringify(payload),
   });
   const json = await res.json().catch(() => ({}));
-  
+
   if (!res.ok) {
     throw new Error(json.message || "Failed updating weekly schedule");
   }
-  
+
   return json;
 }
 
@@ -718,12 +727,12 @@ export async function deleteWeeklySchedule(id) {
     method: "DELETE",
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
-  
+
   if (!res.ok) {
     const json = await res.json().catch(() => ({}));
     throw new Error(json.message || `Failed to delete weekly schedule ${id}`);
   }
-  
+
   return { ok: true };
 }
 
@@ -736,7 +745,7 @@ export async function getWeeklyScheduleDropdowns() {
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
   const json = await res.json().catch(() => ({}));
-  
+
   return {
     ...json,
     ok: res.ok,
@@ -753,7 +762,7 @@ export async function getDailyReportStats() {
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
   const json = await res.json().catch(() => ({}));
-  
+
   return {
     ...json,
     ok: res.ok,
@@ -766,13 +775,15 @@ export async function getDailyReportStats() {
  */
 export async function getDailyReportSummary(date) {
   const accessToken = getAccessToken();
-  const url = date ? `${ENDPOINTS.DAILY_REPORT_SUMMARY}?date=${date}` : ENDPOINTS.DAILY_REPORT_SUMMARY;
-  
+  const url = date
+    ? `${ENDPOINTS.DAILY_REPORT_SUMMARY}?date=${date}`
+    : ENDPOINTS.DAILY_REPORT_SUMMARY;
+
   const res = await fetch(url, {
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
   const json = await res.json().catch(() => ({}));
-  
+
   return {
     ...json,
     ok: res.ok,
@@ -789,7 +800,7 @@ export async function getWeeklyPeriods() {
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
   const json = await res.json().catch(() => ({}));
-  
+
   return {
     ...json,
     ok: res.ok,
@@ -806,7 +817,7 @@ export async function getWeeklyPeriodDetail(id) {
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   });
   const json = await res.json().catch(() => ({}));
-  
+
   return {
     ...json,
     ok: res.ok,
@@ -828,7 +839,8 @@ export async function batchUpdateDailyAttendance(date, attendanceList) {
     body: JSON.stringify({ attendance: attendanceList }),
   });
   const json = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(json.message || "Failed to batch update attendance");
+  if (!res.ok)
+    throw new Error(json.message || "Failed to batch update attendance");
   return json;
 }
 
@@ -839,21 +851,24 @@ export async function updateAttendance(date, employeeId, attendanceData) {
   try {
     const accessToken = getAccessToken();
     console.log("Updating attendance:", { date, employeeId, attendanceData });
-    
-    const res = await fetch(`${ENDPOINTS.DAILY_ATTENDANCE}/${date}/${employeeId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-      },
-      body: JSON.stringify(attendanceData),
-    });
-    
+
+    const res = await fetch(
+      `${ENDPOINTS.DAILY_ATTENDANCE}/${date}/${employeeId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+        },
+        body: JSON.stringify(attendanceData),
+      }
+    );
+
     console.log("Response status:", res.status);
-    
+
     const text = await res.text();
     console.log("Response text:", text);
-    
+
     let json;
     try {
       json = JSON.parse(text);
@@ -861,12 +876,16 @@ export async function updateAttendance(date, employeeId, attendanceData) {
       console.error("Failed to parse JSON:", e);
       throw new Error("Invalid response from server");
     }
-    
+
     if (!res.ok) {
       console.error("Server error response:", json);
-      throw new Error(json.message || json.serverMessage || `Failed to update attendance (${res.status})`);
+      throw new Error(
+        json.message ||
+          json.serverMessage ||
+          `Failed to update attendance (${res.status})`
+      );
     }
-    
+
     return json;
   } catch (error) {
     console.error("API Error updateAttendance:", error);
@@ -902,13 +921,13 @@ export async function getDailyAttendance(date) {
         ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
       },
     });
-    
+
     const json = await res.json();
-    
+
     if (!res.ok) {
       throw new Error(json.message || "Failed to get daily attendance");
     }
-    
+
     return json; // json sudah mengandung { message, data }
   } catch (error) {
     console.error("API Error getDailyAttendance:", error);
@@ -921,14 +940,18 @@ export async function getDailyAttendance(date) {
  */
 export async function getDailyAttendanceSummary(date) {
   const accessToken = getAccessToken();
-  const res = await fetch(`${ENDPOINTS.DAILY_ATTENDANCE}/summary?date=${date}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-    },
-  });
+  const res = await fetch(
+    `${ENDPOINTS.DAILY_ATTENDANCE}/summary?date=${date}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+      },
+    }
+  );
   const json = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(json.message || "Failed to get attendance summary");
+  if (!res.ok)
+    throw new Error(json.message || "Failed to get attendance summary");
   return json;
 }

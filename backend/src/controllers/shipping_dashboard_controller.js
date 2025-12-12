@@ -7,6 +7,7 @@ import {
   getBlendingPlansFiltered,
   getPlanOptimizationLog,
   getLatestSelectedScenario,
+  getVesselStatusList,
 } from "../models/dashboard_model.js";
 
 export const getKpi = async (req, res) => {
@@ -79,6 +80,15 @@ export const getSelectedScenario = async (req, res) => {
   try {
     const result = await getLatestSelectedScenario();
     res.json({ message: "GET selected scenario success", data: result });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+export const getVesselStatus = async (req, res) => {
+  try {
+    const rows = await getVesselStatusList();
+    res.json({ message: "GET vessel status success", data: rows });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
   }

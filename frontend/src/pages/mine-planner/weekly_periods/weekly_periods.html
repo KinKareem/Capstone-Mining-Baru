@@ -1,314 +1,451 @@
 <!DOCTYPE html>
 <html lang="id">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Weekly Periods - Mine Planner</title>
     <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="../../../style/styles.css">
+    <link rel="stylesheet" href="../../../style/styles.css" />
+  </head>
 
-</head>
-
-<body>
+  <body>
     <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 px-0 sidebar">
-                <div class="p-3">
-                    <div class="text-center mb-4">
-                        <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center"
-                            style="width:80px;height:80px;overflow:hidden;">
-                            <img src="/assets/mine-planner-image/mine-planner-profile.png" alt="profile"
-                                style="width:100%;height:100%;object-fit:cover;" />
-                        </div>
+      <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 px-0 sidebar">
+          <div class="p-3">
+            <div class="text-center mb-4">
+              <div
+                class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center"
+                style="width: 80px; height: 80px; overflow: hidden"
+              >
+                <img
+                  src="/assets/mine-planner-image/mine-planner-profile.png"
+                  alt="profile"
+                  style="width: 100%; height: 100%; object-fit: cover"
+                />
+              </div>
 
-                        <h5 class="mt-2 mb-0">Nino</h5>
-                        <small class="text-light">Mine Planner</small>
-                    </div>
-
-                    <nav class="nav flex-column">
-                        <!-- Link Home -->
-                        <a class="nav-link" href="../home/home_planner_page.html">
-                            <i class="bi bi-book me-2"></i> Dashboard
-                        </a>
-                        <a class="nav-link" href="../target_production/mine_plan/mining_plan.html">
-                            <i class="bi bi-cpu me-2"></i> Ai Plan Create
-                        </a>
-                        <a class="nav-link active" href="../weekly_periods/weekly_periods.html">
-                            <i class="bi bi-calendar-week me-2"></i> Weekly Periods
-                        </a>
-                        <a class="nav-link" href="../employees/employees.html">
-                            <i class="bi bi-people me-2"></i> Employees
-                        </a>
-                        <a class="nav-link" href="../equipment/equipment.html">
-                            <i class="bi bi-truck me-2"></i> Equipment
-                        </a>
-                        <a class="nav-link" href="../weekly-schedule/weekly_schedule.html">
-                            <i class="bi bi-calendar-check me-2"></i> Schedule
-                        </a>
-                        <a class="nav-link" href="../daily-report/daily_reports.html">
-                            <i class="bi bi-clipboard-data me-2"></i> Daily Reports
-                        </a>
-                        <a class="nav-link" href="../daily-attendance/daily_attendance.html">
-                            <i class="bi bi-clipboard-check me-2"></i> Daily Attendance
-                        </a>
-                        <a class="nav-link" href="../daily-equipment-status/daily_equipment_status.html">
-                            <i class="bi bi-tools me-2"></i> Equipment Status
-                        </a>
-                        <a class="nav-link" href="../ai_agent/ai_agent_mining.html">
-                            <i class="bi bi-chat me-2"></i> Free Chat
-                        </a>
-                    </nav>
-
-                    <div class="mt-4 pt-4 border-top">
-                        <button class="btn btn-outline-light w-100" id="logout-btn">
-                            <i class="bi bi-box-arrow-right me-2"></i> Logout
-                        </button>
-                    </div>
-                </div>
+              <h5 class="mt-2 mb-0">Nino</h5>
+              <small class="text-light">Mine Planner</small>
             </div>
 
-            <!-- Main Content -->
-            <div class="col-md-9 col-lg-10 content-wrapper">
-                <!-- Header -->
-                <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
-                    <div class="container-fluid">
-                        <h2 class="navbar-brand mb-0">
-                            <i class="bi bi-calendar-week text-primary"></i> Weekly Periods
-                        </h2>
-                        <div class="d-flex align-items-center">
-                            <span class="me-3 text-muted">
-                                <i class="bi bi-clock me-1"></i>
-                                <span id="current-time">--:--:--</span>
-                            </span>
-                        </div>
-                    </div>
-                </nav>
+            <nav class="nav flex-column">
+              <!-- Link Home -->
+              <a class="nav-link" href="../home/home_planner_page.html">
+                <i class="bi bi-book me-2"></i> Dashboard
+              </a>
+              <a
+                class="nav-link"
+                href="../target_production/mine_plan/mining_plan.html"
+              >
+                <i class="bi bi-cpu me-2"></i> Ai Plan Create
+              </a>
+              <a
+                class="nav-link active"
+                href="../weekly_periods/weekly_periods.html"
+              >
+                <i class="bi bi-calendar-week me-2"></i> Weekly Periods
+              </a>
+              <a class="nav-link" href="../employees/employees.html">
+                <i class="bi bi-people me-2"></i> Employees
+              </a>
+              <a class="nav-link" href="../equipment/equipment.html">
+                <i class="bi bi-truck me-2"></i> Equipment
+              </a>
+              <a
+                class="nav-link"
+                href="../weekly-schedule/weekly_schedule.html"
+              >
+                <i class="bi bi-calendar-check me-2"></i> Schedule
+              </a>
+              <a class="nav-link" href="../daily-report/daily_reports.html">
+                <i class="bi bi-clipboard-data me-2"></i> Daily Reports
+              </a>
+              <a
+                class="nav-link"
+                href="../daily-attendance/daily_attendance.html"
+              >
+                <i class="bi bi-clipboard-check me-2"></i> Daily Attendance
+              </a>
+              <a
+                class="nav-link"
+                href="../daily-equipment-status/daily_equipment_status.html"
+              >
+                <i class="bi bi-tools me-2"></i> Equipment Status
+              </a>
+              <a class="nav-link" href="../ai_agent/ai_agent_mining.html">
+                <i class="bi bi-chat me-2"></i> Free Chat
+              </a>
+            </nav>
 
-                <!-- Main Content -->
-                <main class="p-4" id="main-content">
-                    <div class="container-fluid">
-                        <!-- Page Header -->
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div>
-                                <h4 class="mb-1">Weekly Periods Management</h4>
-                                <p class="text-muted mb-0">Manage weekly production planning periods</p>
-                            </div>
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-outline-primary" id="btn-generate-next">
-                                    <i class="bi bi-magic me-1"></i> Generate Next
-                                </button>
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPeriodModal">
-                                    <i class="bi bi-plus-circle me-1"></i> Add New Period
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Stats Cards -->
-                        <div class="row mb-4">
-                            <div class="col-md-3 col-sm-6 mb-3">
-                                <div class="card card-stat bg-primary text-white">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <h6 class="card-subtitle mb-2">Total Periods</h6>
-                                                <h3 class="card-title mb-0" id="total-periods">0</h3>
-                                            </div>
-                                            <i class="bi bi-calendar fs-1 opacity-50"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6 mb-3">
-                                <div class="card card-stat bg-success text-white">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <h6 class="card-subtitle mb-2">Active Period</h6>
-                                                <h5 class="card-title mb-0" id="active-period">-</h5>
-                                            </div>
-                                            <i class="bi bi-calendar-check fs-1 opacity-50"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6 mb-3">
-                                <div class="card card-stat bg-warning text-white">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <h6 class="card-subtitle mb-2">Total Target</h6>
-                                                <h5 class="card-title mb-0" id="total-target">0 tons</h5>
-                                            </div>
-                                            <i class="bi bi-bullseye fs-1 opacity-50"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6 mb-3">
-                                <div class="card card-stat bg-info text-white">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <h6 class="card-subtitle mb-2">Stockpile Target</h6>
-                                                <h5 class="card-title mb-0" id="total-stockpile">0 tons</h5>
-                                            </div>
-                                            <i class="bi bi-stack fs-1 opacity-50"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Periods Table -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">
-                                    <i class="bi bi-table me-2"></i> Weekly Periods List
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover" id="periods-table">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Period Code</th>
-                                                <th>Date Range</th>
-                                                <th>Production Target</th>
-                                                <th>Stockpile Target</th>
-                                                <th>Created</th>
-                                                <th class="text-end">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="periods-table-body">
-                                            <!-- Data will be loaded here -->
-                                            <tr>
-                                                <td colspan="6" class="text-center py-5">
-                                                    <div class="spinner-border text-primary" role="status">
-                                                        <span class="visually-hidden">Loading...</span>
-                                                    </div>
-                                                    <p class="mt-2 text-muted">Loading weekly periods...</p>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </main>
+            <div class="mt-4 pt-4 border-top">
+              <button class="btn btn-outline-light w-100" id="logout-btn">
+                <i class="bi bi-box-arrow-right me-2"></i> Logout
+              </button>
             </div>
+          </div>
         </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 content-wrapper">
+          <!-- Header -->
+          <nav
+            class="navbar navbar-expand-lg navbar-light bg-white border-bottom"
+          >
+            <div class="container-fluid">
+              <h2 class="navbar-brand mb-0">
+                <i class="bi bi-calendar-week text-primary"></i> Weekly Periods
+              </h2>
+              <div class="d-flex align-items-center">
+                <span class="me-3 text-muted">
+                  <i class="bi bi-clock me-1"></i>
+                  <span id="current-time">--:--:--</span>
+                </span>
+              </div>
+            </div>
+          </nav>
+
+          <!-- Main Content -->
+          <main class="p-4" id="main-content">
+            <div class="container-fluid">
+              <!-- Page Header -->
+              <div
+                class="d-flex justify-content-between align-items-center mb-4"
+              >
+                <div>
+                  <h4 class="mb-1">Weekly Periods Management</h4>
+                  <p class="text-muted mb-0">
+                    Manage weekly production planning periods
+                  </p>
+                </div>
+                <div class="d-flex gap-2">
+                  <button
+                    class="btn btn-outline-primary"
+                    id="btn-generate-next"
+                  >
+                    <i class="bi bi-magic me-1"></i> Generate Next
+                  </button>
+                  <button
+                    class="btn btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addPeriodModal"
+                  >
+                    <i class="bi bi-plus-circle me-1"></i> Add New Period
+                  </button>
+                </div>
+              </div>
+
+              <!-- Stats Cards -->
+              <div class="row mb-4">
+                <div class="col-md-3 col-sm-6 mb-3">
+                  <div class="card card-stat bg-primary text-white">
+                    <div class="card-body">
+                      <div
+                        class="d-flex justify-content-between align-items-center"
+                      >
+                        <div>
+                          <h6 class="card-subtitle mb-2">Total Periods</h6>
+                          <h3 class="card-title mb-0" id="total-periods">0</h3>
+                        </div>
+                        <i class="bi bi-calendar fs-1 opacity-50"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                  <div class="card card-stat bg-success text-white">
+                    <div class="card-body">
+                      <div
+                        class="d-flex justify-content-between align-items-center"
+                      >
+                        <div>
+                          <h6 class="card-subtitle mb-2">Active Period</h6>
+                          <h5 class="card-title mb-0" id="active-period">-</h5>
+                        </div>
+                        <i class="bi bi-calendar-check fs-1 opacity-50"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                  <div class="card card-stat bg-warning text-white">
+                    <div class="card-body">
+                      <div
+                        class="d-flex justify-content-between align-items-center"
+                      >
+                        <div>
+                          <h6 class="card-subtitle mb-2">Total Target</h6>
+                          <h5 class="card-title mb-0" id="total-target">
+                            0 tons
+                          </h5>
+                        </div>
+                        <i class="bi bi-bullseye fs-1 opacity-50"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                  <div class="card card-stat bg-info text-white">
+                    <div class="card-body">
+                      <div
+                        class="d-flex justify-content-between align-items-center"
+                      >
+                        <div>
+                          <h6 class="card-subtitle mb-2">Stockpile Target</h6>
+                          <h5 class="card-title mb-0" id="total-stockpile">
+                            0 tons
+                          </h5>
+                        </div>
+                        <i class="bi bi-stack fs-1 opacity-50"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Periods Table -->
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="card-title mb-0">
+                    <i class="bi bi-table me-2"></i> Weekly Periods List
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-hover" id="periods-table">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Period Code</th>
+                          <th>Date Range</th>
+                          <th>Production Target</th>
+                          <th>Stockpile Target</th>
+                          <th>Created</th>
+                          <th class="text-end">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody id="periods-table-body">
+                        <!-- Data will be loaded here -->
+                        <tr>
+                          <td colspan="6" class="text-center py-5">
+                            <div
+                              class="spinner-border text-primary"
+                              role="status"
+                            >
+                              <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2 text-muted">
+                              Loading weekly periods...
+                            </p>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
     </div>
 
     <!-- Add Period Modal -->
     <div class="modal fade" id="addPeriodModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="bi bi-plus-circle me-2"></i> Add New Weekly Period
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-plus-circle me-2"></i> Add New Weekly Period
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="addPeriodForm">
+              <div class="mb-3">
+                <label class="form-label">Period Code *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="period_code"
+                  placeholder="e.g., WEEK-2024-W15"
+                  required
+                />
+                <div class="form-text">Unique identifier for this period</div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Start Date *</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="start_date"
+                    required
+                  />
                 </div>
-                <div class="modal-body">
-                    <form id="addPeriodForm">
-                        <div class="mb-3">
-                            <label class="form-label">Period Code *</label>
-                            <input type="text" class="form-control" id="period_code" placeholder="e.g., WEEK-2024-W15"
-                                required>
-                            <div class="form-text">Unique identifier for this period</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Start Date *</label>
-                                <input type="date" class="form-control" id="start_date" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">End Date *</label>
-                                <input type="date" class="form-control" id="end_date" required>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Production Target (tons)</label>
-                                <input type="number" class="form-control" id="target_tonnage" min="0" step="100"
-                                    placeholder="0">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Stockpile Target (tons)</label>
-                                <input type="number" class="form-control" id="stockpile_tons_target" min="0" step="100"
-                                    placeholder="0">
-                            </div>
-                        </div>
-                    </form>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">End Date *</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="end_date"
+                    required
+                  />
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="btn-save-period">Save Period</button>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Production Target (tons)</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="target_tonnage"
+                    min="0"
+                    step="100"
+                    placeholder="0"
+                  />
                 </div>
-            </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Stockpile Target (tons)</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="stockpile_tons_target"
+                    min="0"
+                    step="100"
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary" id="btn-save-period">
+              Save Period
+            </button>
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- Edit Period Modal -->
     <div class="modal fade" id="editPeriodModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="bi bi-pencil-square me-2"></i> Edit Weekly Period
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-pencil-square me-2"></i> Edit Weekly Period
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editPeriodForm">
+              <input type="hidden" id="edit_period_id" />
+              <div class="mb-3">
+                <label class="form-label">Period Code *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="edit_period_code"
+                  required
+                />
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Start Date *</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="edit_start_date"
+                    required
+                  />
                 </div>
-                <div class="modal-body">
-                    <form id="editPeriodForm">
-                        <input type="hidden" id="edit_period_id">
-                        <div class="mb-3">
-                            <label class="form-label">Period Code *</label>
-                            <input type="text" class="form-control" id="edit_period_code" required>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Start Date *</label>
-                                <input type="date" class="form-control" id="edit_start_date" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">End Date *</label>
-                                <input type="date" class="form-control" id="edit_end_date" required>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Production Target (tons)</label>
-                                <input type="number" class="form-control" id="edit_target_tonnage" min="0" step="100">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Stockpile Target (tons)</label>
-                                <input type="number" class="form-control" id="edit_stockpile_tons_target" min="0"
-                                    step="100">
-                            </div>
-                        </div>
-                    </form>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">End Date *</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="edit_end_date"
+                    required
+                  />
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="btn-update-period">Update Period</button>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Production Target (tons)</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="edit_target_tonnage"
+                    min="0"
+                    step="100"
+                  />
                 </div>
-            </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Stockpile Target (tons)</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="edit_stockpile_tons_target"
+                    min="0"
+                    step="100"
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="btn-update-period"
+            >
+              Update Period
+            </button>
+          </div>
         </div>
+      </div>
     </div>
 
     <div class="position-fixed bottom-0 end-0 m-4">
-        <button class="btn btn-primary rounded-circle d-flex
-                        align-items-center justify-content-center shadow" style="width:48px;height:48px;">
-            <i class="bi bi-robot fs-5"></i>
-        </button>
+      <button
+        class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center shadow"
+        style="width: 48px; height: 48px"
+      >
+        <i class="bi bi-robot fs-5"></i>
+      </button>
     </div>
 
     <!-- Bootstrap JS -->
@@ -317,6 +454,5 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- Weekly Periods JavaScript -->
     <script type="module" src="./weekly_periods.js"></script>
-</body>
-
+  </body>
 </html>

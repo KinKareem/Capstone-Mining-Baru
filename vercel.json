@@ -1,0 +1,28 @@
+{
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "frontend/dist" }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/src/pages/mine-planner/weekly_periods/weekly_periods.html",
+      "dest": "/weeklyPeriods.html"
+    }
+    ,
+    {
+      "src": "/src/pages/mine-planner/employees/employees.html",
+      "dest": "/employees.html"
+    },
+    {
+      "src": "/src/pages/mine-planner/equipment/equipment.html",
+      "dest": "/equipment.html"
+    },
+    {
+      "src": "/src/pages/mine-planner/daily-equipment-status/daily_equipment_status.html",
+      "dest": "/dailyEquipment.html"
+    }
+  ]
+}

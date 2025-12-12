@@ -200,7 +200,7 @@ export const getWeatherToday = async () => {
 
 export const getUpcomingVesselCount = async () => {
   const [[{ cnt }]] = await dbPool.query(
-    "SELECT COUNT(*) AS cnt FROM shipping_schedule WHERE eta_date >= CURDATE()"
+    "SELECT COUNT(*) AS cnt FROM tb_shipping_schedule WHERE departure_date >= CURDATE()"
   );
   return cnt || 0;
 };
@@ -222,26 +222,33 @@ export const getCurrentWeekTargetTonnage = async () => {
 
 export const getShippingScheduleTimeline = async () => {
   const [rows] = await dbPool.query(
-    "SELECT vessel_id, vessel_name, eta_date, latest_berthing, target_load_tons FROM shipping_schedule ORDER BY eta_date ASC"
+    "SELECT id AS vessel_id, vessel_name, departure_date AS eta_date, departure_date AS latest_berthing, tonnage AS target_load_tons FROM tb_shipping_schedule ORDER BY departure_date ASC"
   );
   return rows;
 };
 
 export const getTargetVsActualLoadingPerVessel = async () => {
   const [rows] = await dbPool.query(
-    `SELECT ss.vessel_id,
+    `SELECT ss.id AS vessel_id,
             ss.vessel_name,
-            ss.target_load_tons,
+            ss.tonnage AS target_load_tons,
             COALESCE(SUM(drd.tonnage), 0) AS actual_tonnage
-     FROM shipping_schedule ss
+     FROM tb_shipping_schedule ss
      LEFT JOIN weekly_periods wp
-       ON COALESCE(ss.latest_berthing, ss.eta_date) BETWEEN wp.start_date AND wp.end_date
+       ON COALESCE(ss.departure_date, ss.departure_date) BETWEEN wp.start_date AND wp.end_date
      LEFT JOIN daily_reports dr
        ON dr.period_id = wp.period_id
      LEFT JOIN daily_report_details drd
        ON drd.report_id = dr.report_id
-     GROUP BY ss.vessel_id, ss.vessel_name, ss.target_load_tons, ss.eta_date
-     ORDER BY ss.eta_date ASC`
+     GROUP BY ss.id, ss.vessel_name, target_load_tons, ss.departure_date
+     ORDER BY ss.departure_date ASC`
+  );
+  return rows;
+};
+
+export const getVesselStatusList = async () => {
+  const [rows] = await dbPool.query(
+    "SELECT id AS vessel_id, vessel_name, status FROM tb_shipping_schedule ORDER BY departure_date DESC"
   );
   return rows;
 };
