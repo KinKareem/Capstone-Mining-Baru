@@ -513,3 +513,190 @@ canvas {
 .d-block {
   display: block !important;
 }
+
+/* Status badges for shipping */
+.status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-scheduled {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.status-loading {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-departed {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-arrived {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-cancelled {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* Vessel status in timeline */
+.vessel-status-ready {
+    background: linear-gradient(90deg, #4ADE80, #10b981);
+}
+
+.vessel-status-arriving {
+    background: linear-gradient(90deg, #FBBF24, #f59e0b);
+}
+
+.vessel-status-delayed {
+    background: linear-gradient(90deg, #F87171, #ef4444);
+}
+
+.vessel-status-completed {
+    background: linear-gradient(90deg, #60A5FA, #3b82f6);
+}
+
+/* Shipping specific cards */
+.shipping-card {
+    border-left: 4px solid #3b82f6;
+    transition: transform 0.2s;
+}
+
+.shipping-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+/* Timeline container */
+.timeline-container {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline-container::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #e5e7eb;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2rem;
+    top: 0.5rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background-color: #3b82f6;
+    border: 2px solid white;
+    box-shadow: 0 0 0 3px #e5e7eb;
+}
+
+/* Responsive table for shipping */
+@media (max-width: 768px) {
+    .shipping-table th:nth-child(6),
+    .shipping-table td:nth-child(6),
+    .shipping-table th:nth-child(7),
+    .shipping-table td:nth-child(7) {
+        display: none;
+    }
+}
+
+/* Loading animation for shipping */
+.shipping-loader {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(59, 130, 246, 0.1);
+    border-radius: 50%;
+    border-top-color: #3b82f6;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Empty state for shipping */
+.empty-shipping-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6b7280;
+}
+
+.empty-shipping-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* Shipping progress bar */
+.shipping-progress {
+    height: 8px;
+    border-radius: 4px;
+    background-color: #e5e7eb;
+    overflow: hidden;
+}
+
+.shipping-progress-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* Card hover effects for shipping */
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Badge styles for shipping */
+.badge-tonnage {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    font-weight: 600;
+}
+
+.badge-vessel {
+    background-color: #fce7f3;
+    color: #be185d;
+    font-weight: 600;
+}
+
+.badge-eta {
+    background-color: #dcfce7;
+    color: #166534;
+    font-weight: 600;
+}
+
+/* Table row hover for shipping */
+.table-shipping tbody tr {
+    transition: background-color 0.2s;
+}
+
+.table-shipping tbody tr:hover {
+    background-color: #f8fafc;
+}

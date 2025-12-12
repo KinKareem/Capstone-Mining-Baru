@@ -2,223 +2,263 @@
 <html lang="id">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shipping Schedule - Shipping Planner</title>
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-  <!-- Custom CSS -->
-  <style>
-    .sidebar {
-      min-height: 100vh;
-      background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
-      color: white;
-    }
-
-    .sidebar .nav-link {
-      color: #ecf0f1;
-      padding: 0.8rem 1rem;
-      margin: 0.2rem 0;
-      border-radius: 0.5rem;
-      transition: all 0.3s;
-    }
-
-    .sidebar .nav-link:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-    }
-
-    .sidebar .nav-link.active {
-      background: #3498db;
-      color: white;
-    }
-
-    .sidebar .dropdown-menu {
-      background: #2c3e50;
-      border: 1px solid #34495e;
-    }
-
-    .sidebar .dropdown-item {
-      color: #ecf0f1;
-    }
-
-    .sidebar .dropdown-item:hover {
-      background: #34495e;
-      color: white;
-    }
-
-    .content-wrapper {
-      background-color: #f8f9fa;
-    }
-
-    .card-stat {
-      border: none;
-      border-radius: 10px;
-      transition: transform 0.3s;
-    }
-
-    .card-stat:hover {
-      transform: translateY(-5px);
-    }
-
-    .content-wrapper {
-      padding: 20px;
-    }
-
-    /* Gantt Container Styles */
-    .gantt-container {
-      position: relative;
-      min-height: 260px;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 12px;
-      overflow: auto;
-      background-color: white;
-    }
-
-    .gantt-bar {
-      position: absolute;
-      height: 24px;
-      border-radius: 6px;
-      opacity: 0.8;
-    }
-
-    .vessel-status-ready {
-      background: linear-gradient(90deg, #4ADE80, #10b981);
-    }
-
-    .vessel-status-arriving {
-      background: linear-gradient(90deg, #FBBF24, #f59e0b);
-    }
-
-    .vessel-status-delayed {
-      background: linear-gradient(90deg, #F87171, #ef4444);
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shipping Schedule - Shipping Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="../../../style/styles.css" />
 </head>
 
 <body>
-  <div class="container-fluid">
-    <div class="row">
-      <!-- Sidebar -->
-      <div class="col-md-3 col-lg-2 px-0 sidebar">
-        <div class="p-3">
-          <div class="text-center mb-4">
-            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center"
-              style="width:80px;height:80px;overflow:hidden;">
-              <img src="../../../../public/assets/mine-planner-image/mine-planner-profile.png" alt="profile"
-                style="width:100%;height:100%;object-fit:cover;" />
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0 sidebar">
+                <div class="p-3">
+                    <div class="text-center mb-4">
+                        <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center"
+                            style="width: 80px; height: 80px; overflow: hidden">
+                            <img src="/assets/mine-planner-image/mine-planner-profile.png" alt="profile"
+                                style="width: 100%; height: 100%; object-fit: cover" />
+                        </div>
+
+                        <h5 class="mt-2 mb-0">Nino</h5>
+                        <small class="text-light">Shipping Planner</small>
+                    </div>
+
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="../home/home_shipping_page.html">
+                            <i class="bi bi-book me-2"></i> Dashboard
+                        </a>
+                        <a class="nav-link active" href="../shipping_schedule/shipping_schedule.html">
+                            <i class="bi bi-calendar-check me-2"></i> set Schedule
+                        </a>
+                        <a class="nav-link" href="../ai_plan/ship_plan.html">
+                            <i class="bi bi-stars me-2"></i> Shipping AI Plan
+                        </a>
+                        <a class="nav-link" href="../shipping_vessel/shipping_vessel.html">
+                            <i class="bi bi-compass me-2"></i> Shipping Vessel
+                        </a>
+                        <a class="nav-link" href="../ai_agent/ai_agent_shipping.html">
+                            <i class="bi bi-chat me-2"></i> Free Chat
+                        </a>
+                    </nav>
+
+                    <div class="mt-4 pt-4 border-top">
+                        <button class="btn btn-outline-light w-100" id="logout-btn">
+                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <h5 class="mt-2 mb-0">Nino</h5>
-            <small class="text-light">Shipping Planner</small>
-          </div>
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 content-wrapper">
+                <!-- Header -->
+                <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+                    <div class="container-fluid">
+                        <h2 class="navbar-brand mb-0">
+                            <i class="bi bi-calendar-check text-primary"></i> Shipping Schedule
+                        </h2>
+                        <div class="d-flex align-items-center">
+                            <span class="me-3 text-muted">
+                                <i class="bi bi-clock me-1"></i>
+                                <span id="current-time">--:--:--</span>
+                            </span>
+                        </div>
+                    </div>
+                </nav>
 
-          <nav class="nav flex-column">
-            <a class="nav-link" href="../home/home_shipping_page.html">
-              <i class="bi bi-book me-2"></i> Dashboard
-            </a>
-            <a class="nav-link active" href="../shipping_schedule/shipping_schedule.html">
-              <i class="bi bi-calendar-check me-2"></i> Set Schedule
-            </a>
-            <a class="nav-link" href="../ai_plan/ship_plan.html">
-              <i class="bi bi-stars me-2"></i> Shipping AI Plan
-            </a>
-            <a class="nav-link" href="../shipping_vessel/shipping_vessel.html">
-              <i class="bi bi-compass me-2"></i> Shipping Vessel
-            </a>
-            <a class="nav-link" href="../ai_agent/ai_agent_shipping.html">
-              <i class="bi bi-chat me-2"></i> Free Chat
-            </a>
-          </nav>
+                <!-- Main Content -->
+                <main class="p-4" id="main-content">
+                    <div class="container-fluid">
+                        <!-- Page Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h4 class="mb-1">Vessel Shipping Schedule</h4>
+                                <p class="text-muted mb-0">
+                                    Manage vessel schedules, ETA, and berthing plans
+                                </p>
+                            </div>
+                            <div class="d-flex gap-2 align-items-center">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addScheduleModal">
+                                    <i class="bi bi-plus-circle me-1"></i> Add Schedule
+                                </button>
+                            </div>
+                        </div>
 
-          <div class="mt-4 pt-4 border-top">
-            <button class="btn btn-outline-light w-100" id="logout-btn">
-              <i class="bi bi-box-arrow-right me-2"></i> Logout
-            </button>
-          </div>
+                        <!-- Stats Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card card-stat bg-primary text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-2">Total Vessels</h6>
+                                                <h3 class="card-title mb-0" id="total-vessels">0</h3>
+                                            </div>
+                                            <i class="bi bi-ship fs-1 opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card card-stat bg-success text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-2">This Month</h6>
+                                                <h3 class="card-title mb-0" id="monthly-vessels">0</h3>
+                                            </div>
+                                            <i class="bi bi-calendar-month fs-1 opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card card-stat bg-warning text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-2">Total Load</h6>
+                                                <h3 class="card-title mb-0" id="total-load">0 tons</h3>
+                                            </div>
+                                            <i class="bi bi-bar-chart fs-1 opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card card-stat bg-info text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="card-subtitle mb-2">Upcoming</h6>
+                                                <h5 class="card-title mb-0" id="upcoming-vessels">0</h5>
+                                            </div>
+                                            <i class="bi bi-clock-history fs-1 opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Schedule Table -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-table me-2"></i> Shipping Schedule List
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Vessel ID</th>
+                                                <th>Vessel Name</th>
+                                                <th>ETA Date</th>
+                                                <th>Latest Berthing</th>
+                                                <th>Target Load (tons)</th>
+                                                <th>Shipping Notes</th>
+                                                <th>Updated At</th>
+                                                <th class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="schedule-table-body">
+                                            <!-- Data loaded here -->
+                                            <tr>
+                                                <td colspan="8" class="text-center py-5">
+                                                    <div class="spinner-border text-primary" role="status">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                    <p class="mt-2 text-muted">Loading shipping schedules...</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="mt-3 text-muted small">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Showing all vessel schedules. Click Edit to update details.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
         </div>
-      </div>
-
-      <!-- Main Content -->
-      <div class="col-md-9 col-lg-10 content-wrapper">
-        <!-- Header -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
-          <div class="container-fluid">
-            <h2 class="navbar-brand mb-0">
-              <i class="bi bi-calendar-check text-primary"></i> Shipping Schedule
-            </h2>
-            <div class="d-flex align-items-center">
-              <span class="me-3 text-muted">
-                <i class="bi bi-clock me-1"></i>
-                <span id="current-time">--:--:--</span>
-              </span>
-              <div class="dropdown">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                  <i class="bi bi-bell"></i>
-                  <span class="badge bg-danger">2</span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                  <li><a class="dropdown-item" href="#">New schedule added</a></li>
-                  <li><a class="dropdown-item" href="#">Schedule conflict alert</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </nav>
-
-        <!-- Main Content Area (Mempertahankan konten asli) -->
-        <main class="main-content p-4">
-          <h1 class="mb-4" style="font-size: 30px; font-weight: 700; color: #1f2937">
-            Shipping Schedule
-          </h1>
-          <p class="text-muted">
-            Timeline dan jadwal berthing vessel untuk periode berjalan.
-          </p>
-          <div id="ganttContainer" class="gantt-container"></div>
-        </main>
-      </div>
     </div>
-  </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script type="module" src="../home/minichatbox.js"></script>
-  <script type="module" src="./shipping_schedule.js"></script>
+    <!-- Add/Edit Modal -->
+    <div class="modal fade" id="addScheduleModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-calendar-plus me-2"></i> Add Shipping Schedule
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="scheduleForm">
+                        <div class="mb-3">
+                            <label class="form-label">Vessel ID *</label>
+                            <input type="text" class="form-control" id="vessel_id" required
+                                placeholder="e.g., VSL-001" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Vessel Name *</label>
+                            <input type="text" class="form-control" id="vessel_name" required
+                                placeholder="e.g., MV Ocean Carrier" />
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">ETA Date *</label>
+                                <input type="date" class="form-control" id="eta_date" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Latest Berthing *</label>
+                                <input type="date" class="form-control" id="latest_berthing" required />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Target Load (tons) *</label>
+                            <input type="number" class="form-control" id="target_load_tons" min="0" required
+                                placeholder="e.g., 50000" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Shipping Notes</label>
+                            <textarea class="form-control" id="shipping_notes" rows="3"
+                                placeholder="Optional notes..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btn-save-schedule">
+                        <i class="bi bi-save me-1"></i> Save Schedule
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-  <!-- Current Time Script -->
-  <script>
-    function updateTime() {
-      const now = new Date();
-      const timeString = now.toLocaleTimeString('id-ID', {
-        hour12: false,
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      });
-      document.getElementById('current-time').textContent = timeString;
-    }
-    updateTime();
-    setInterval(updateTime, 1000);
+    <div class="position-fixed bottom-0 end-0 m-4">
+        <button class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center shadow"
+            style="width: 48px; height: 48px">
+            <i class="bi bi-robot fs-5"></i>
+        </button>
+    </div>
 
-    // Open chat from sidebar
-    document.getElementById('openChatShip')?.addEventListener('click', function (e) {
-      e.preventDefault();
-      // Trigger chat open - adjust this based on your chat implementation
-      const chatToggle = document.getElementById('chatToggle');
-      if (chatToggle) chatToggle.click();
-    });
-
-    // Logout button handler
-    document.getElementById('logout-btn')?.addEventListener('click', function () {
-      if (confirm('Are you sure you want to logout?')) {
-        // Add your logout logic here
-        window.location.href = '../login/login.html';
-      }
-    });
-  </script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Shipping Schedule JavaScript -->
+    <script type="module" src="./shipping_schedule.js"></script>
 </body>
 
 </html>
