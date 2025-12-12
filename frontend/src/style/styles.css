@@ -24,6 +24,8 @@
 
 .content-wrapper {
   background-color: #f8f9fa;
+  padding: 20px;
+  min-height: 100vh;
 }
 
 .card-stat {
