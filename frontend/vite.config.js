@@ -14,13 +14,13 @@ export default defineConfig({
           __dirname,
           "src/pages/mine-planner/home/home_planner_page.html"
         ),
-        crew: resolve(
-          __dirname,
-          "src/pages/mine-planner/crew/crew_management_page.html"
-        ),
-        pit: resolve(
-          __dirname, "src/pages/mine-planner/pit/pit.html"
-        ),
+        // crew: resolve(
+        //   __dirname,
+        //   "src/pages/mine-planner/crew/crew_management_page.html"
+        // ),
+        // pit: resolve(
+        //   __dirname, "src/pages/mine-planner/pit/pit.html"
+        // ),
         targetProduction: resolve(
           __dirname,
           "src/pages/mine-planner/target_production/target_production.html"
@@ -43,11 +43,11 @@ export default defineConfig({
         ),
         dailyEquipment: resolve(
           __dirname,
-          "src/pages/mine-planner/daily-equipment-status/daily_equipment-status.html"
+          "src/pages/mine-planner/daily-equipment-status/daily_equipment_status.html"
         ),
         dailyReport: resolve(
           __dirname,
-          "src/pages/mine-planner/daily-report/daily_report.html"
+          "src/pages/mine-planner/daily-report/daily_reports.html"
         ),
         employees: resolve(
           __dirname,
@@ -59,7 +59,7 @@ export default defineConfig({
         ),
         weeklyPeriods: resolve(
           __dirname,
-          "src/pages/mine-planner/weekly-periods/weekly_periods.html"
+          "src/pages/mine-planner/weekly_periods/weekly_periods.html"
         ),
         weeklySchedule: resolve(
           __dirname,

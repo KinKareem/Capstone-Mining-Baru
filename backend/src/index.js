@@ -13,8 +13,6 @@ import dashboardRoutes from "./routes/dashboard_route.js";
 import shippingDashboardRoutes from "./routes/shipping_dashboard_route.js";
 import aiRecommendationRoutes from "./routes/ai_recommendation_route.js";
 import aiSummaryRoutes from "./routes/ai_summary_route.js";
-import shippingScheduleRoutes from "./routes/shipping_schedule_route.js";
-import shippingVesselRoutes from "./routes/shipping_vessel_route.js";
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -85,14 +83,7 @@ app.use("/api/daily-equipment-status", dailyEquipmentStatusRoutes);
 // API blending-plan
 app.use("/dashboard", dashboardRoutes);
 
-// API dashboard shipping
 app.use("/shipping-dashboard", shippingDashboardRoutes);
-
-// Api shipping-schedules
-app.use("/shipping-schedules", shippingScheduleRoutes);
-
-// Api shipping-vessel
-app.use("/shipping-vessels", shippingVesselRoutes);
 
 app.use((err, req, res, next) => {
   const status = err.status || 500;
