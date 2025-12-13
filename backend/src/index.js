@@ -11,6 +11,7 @@ import dailyAttendanceRoutes from "./routes/daily_attendance_route.js";
 import dailyEquipmentStatusRoutes from "./routes/daily_equipment_status_route.js";
 import dashboardRoutes from "./routes/dashboard_route.js";
 import shippingDashboardRoutes from "./routes/shipping_dashboard_route.js";
+import shippingScheduleRoutes from "./routes/shipping_schedule_route.js";
 import aiRecommendationRoutes from "./routes/ai_recommendation_route.js";
 import aiSummaryRoutes from "./routes/ai_summary_route.js";
 
@@ -73,19 +74,28 @@ app.use("/api/weekly-schedules", weeklyScheduleRoutes);
 
 // API daily-attendance
 app.use("/daily-attendance", dailyAttendanceRoutes);
+app.use("/api/daily-attendance", dailyAttendanceRoutes);
 
 // API ai_summary
 app.use("/ai_summary", aiSummaryRoutes);
+app.use("/api/ai_summary", aiSummaryRoutes);
 
 app.use("/ai_recommendation", aiRecommendationRoutes);
+app.use("/api/ai_recommendation", aiRecommendationRoutes);
 
 // API daily-equipment-status
 app.use("/api/daily-equipment-status", dailyEquipmentStatusRoutes);
 
 // API blending-plan
 app.use("/dashboard", dashboardRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.use("/shipping-dashboard", shippingDashboardRoutes);
+app.use("/api/shipping-dashboard", shippingDashboardRoutes);
+
+// API shipping-schedules
+app.use("/shipping-schedules", shippingScheduleRoutes);
+app.use("/api/shipping-schedules", shippingScheduleRoutes);
 
 app.use((err, req, res, next) => {
   const status = err.status || 500;
