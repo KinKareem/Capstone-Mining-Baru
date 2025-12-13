@@ -8,6 +8,61 @@ const N8N_APPROVAL =
   "https://pojer26018.app.n8n.cloud/webhook-test/approval";
 const LOGS_URL = `${BASE_URL}/shipping-dashboard/optimization-logs`;
 
+// === Inject CSS langsung dari JS ===
+document.head.insertAdjacentHTML(
+  "beforeend",
+  `
+  <style>
+    #ship-summary {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 20px 24px;
+      border: 1px solid #e6e6e6;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      font-family: 'Inter', sans-serif;
+    }
+
+    #ship-summary h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    #ship-summary h3 {
+      font-size: 1.15rem;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-weight: 700;
+      color: #d9534f;
+    }
+
+    #ship-summary p {
+      margin-bottom: 12px;
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    #ship-summary strong {
+      font-weight: 600;
+    }
+
+    #ship-summary ul {
+      padding-left: 18px;
+    }
+
+    #ship-summary ul li {
+      margin-bottom: 6px;
+      font-size: 0.92rem;
+    }
+
+    /* Alert styling */
+    #ship-summary ul li strong {
+      color: #333;
+    }
+  </style>
+  `
+);
+
 async function loadSummary() {
   const box = document.getElementById("ship-summary");
   try {
@@ -16,29 +71,26 @@ async function loadSummary() {
     const data = json.data || json; // controller ai_summary mengembalikan {data}
     const fmt = (n) => (n ?? 0).toLocaleString("id-ID");
     box.innerHTML = `
-      <h1 class="fw-bold mb-3">📄 AI Summary Result</h1>
-      <h2 class="fw-bold mb-2">🤖 AI Situation Analysis</h2>
+      <h2 class="fw-bold mb-2">AI Situation Analysis</h2>
       <p>${data?.situation_summary ?? "Tidak ada summary"}</p>
 
       <div class="mt-2">
         <strong>Baseline Target:</strong> ${fmt(
-          data?.suggested_baseline_target
-        )} tons <br>
+      data?.suggested_baseline_target
+    )} tons <br>
         <strong>Current Stockpile:</strong> ${fmt(
-          data?.current_stockpile_tons
-        )} tons <br>
+      data?.current_stockpile_tons
+    )} tons <br>
         <strong>Source:</strong> ${data?.data_source ?? "-"}
       </div>
 
       <div class="mt-3">
         <h3>⚠️ Alerts</h3>
         <ul class="mb-0">
-          <li><strong>Weather:</strong> ${
-            data?.alerts?.weather_alert ?? "-"
-          }</li>
-          <li><strong>Shipping:</strong> ${
-            data?.alerts?.shipping_alert ?? "-"
-          }</li>
+          <li><strong>Weather:</strong> ${data?.alerts?.weather_alert ?? "-"
+      }</li>
+          <li><strong>Shipping:</strong> ${data?.alerts?.shipping_alert ?? "-"
+      }</li>
           <li><strong>Fleet:</strong> ${data?.alerts?.fleet_alert ?? "-"}</li>
         </ul>
       </div>
@@ -75,28 +127,155 @@ async function loadSelectedScenario() {
       const step = String(latest?.current_step ?? "").trim();
       if (step === "COMPLETED") statusBadge = `<span class="badge bg-success mb-2">Approved</span>`;
       else if (step === "FINAL_APPROVAL") statusBadge = `<span class="badge bg-primary mb-2">Final Approval</span>`;
-    } catch {}
+    } catch { }
 
     const badge = scn.ai_recommended
       ? `<span class="badge bg-warning text-dark mb-2">AI Recommended</span>`
       : "";
     box.innerHTML = `
-      <div class="card p-3 scenario-card">
-        <h3 class="mb-1">${scn.name}</h3>
-        ${badge}
-        ${statusBadge}
-        <div><strong>Focus:</strong> ${scn.focus}</div>
-        <div><strong>Feasibility:</strong> ${scn.feasibility_score}</div>
-        <div class="mt-2"><strong>Strategy Summary:</strong> ${scn.strategy_summary}</div>
-        <div class="mt-3">
-          <div class="fw-bold mb-1">Kelebihan:</div>
-          <ul class="mb-2">${pros}</ul>
-          <div class="fw-bold mb-1">Kekurangan:</div>
-          <ul class="mb-2">${cons}</ul>
-        </div>
-        <div class="mt-2"><strong>Estimated Production:</strong> ${scn.estimated_production_tons} tons</div>
+  <div class="card p-4 scenario-card shadow-sm">
+    
+    <div class="d-flex justify-content-between align-items-start mb-2">
+      <h3 class="mb-0">${scn.name}</h3>
+      ${badge}
+    </div>
+
+    ${statusBadge}
+
+    <hr>
+
+    <div class="row mb-2">
+      <div class="col-md-6">
+        <p><strong>Focus:</strong><br><small>${scn.focus}</small></p>
       </div>
-    `;
+      <div class="col-md-6">
+        <p><strong>Feasibility Score:</strong><br>
+          <span class="badge bg-primary">${scn.feasibility_score}</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <strong>Strategy Summary:</strong>
+      <p class="mb-1">${scn.strategy_summary}</p>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="fw-bold mb-1 text-success">Strengths:</div>
+        <ul class="mb-0">${pros}</ul>
+      </div>
+      <div class="col-md-6">
+        <div class="fw-bold mb-1 text-danger">Weaknesses:</div>
+        <ul class="mb-0">${cons}</ul>
+      </div>
+    </div>
+
+    <div class="mb-2">
+      <strong>Estimated Production:</strong>
+      <span class="badge bg-success ms-2">
+        ${scn.estimated_production_tons} tons
+      </span>
+    </div>
+
+    ${scn.comparison_to_user_draft
+        ? `
+        <div class="alert alert-secondary mt-3">
+          <strong>Comparison to User Draft:</strong><br>
+          <small>${scn.comparison_to_user_draft}</small>
+        </div>
+      `
+        : ""
+      }
+
+    ${scn.financial_implication
+        ? `
+        <div class="alert alert-info mt-2">
+          <strong>Financial Implication:</strong><br>
+          <small>${scn.financial_implication}</small>
+        </div>
+      `
+        : ""
+      }
+
+${scn.role_specific_plan
+        ? `
+    <hr>
+    <h5 class="mt-3 mb-3">Role Specific Plans</h5>
+
+    <div class="row g-3">
+
+      <!-- MINE PLANNER (KIRI) -->
+      ${scn.role_specific_plan.mine_planner
+          ? `
+          <div class="col-md-6">
+            <div class="card h-100 border-start border-primary border-4">
+              <div class="card-body">
+                <h6 class="text-primary mb-2">⛏️ Mine Planner</h6>
+
+                <p class="mb-2">
+                  <strong>Main Objective:</strong><br>
+                  <small>${scn.role_specific_plan.mine_planner.main_objective}</small>
+                </p>
+
+                <p class="mb-2">
+                  <strong>Pit Focus:</strong><br>
+                  <small>${scn.role_specific_plan.mine_planner.pit_focus}</small>
+                </p>
+
+                <p class="mb-0">
+                  <strong>Fleet Instruction:</strong><br>
+                  <small>${scn.role_specific_plan.mine_planner.fleet_instruction}</small>
+                </p>
+              </div>
+            </div>
+          </div>
+        `
+          : ""
+        }
+
+      <!-- SHIPPING PLANNER (KANAN) -->
+      ${scn.role_specific_plan.shipping_planner
+          ? `
+          <div class="col-md-6">
+            <div class="card h-100 border-start border-success border-4">
+              <div class="card-body">
+                <h6 class="text-success mb-2">🚢 Shipping Planner</h6>
+
+                <p class="mb-2">
+                  <strong>Main Objective:</strong><br>
+                  <small>${scn.role_specific_plan.shipping_planner.main_objective}</small>
+                </p>
+
+                <p class="mb-2">
+                  <strong>Berthing Instruction:</strong><br>
+                  <small>${scn.role_specific_plan.shipping_planner.berthing_instruction}</small>
+                </p>
+
+                ${scn.role_specific_plan.shipping_planner.risk_warning
+            ? `
+                    <div class="alert alert-warning mt-2 mb-0 py-2">
+                      <strong>⚠️ Risk Warning:</strong><br>
+                      <small>${scn.role_specific_plan.shipping_planner.risk_warning}</small>
+                    </div>
+                  `
+            : ""
+          }
+              </div>
+            </div>
+          </div>
+        `
+          : ""
+        }
+
+    </div>
+  `
+        : ""
+      }
+
+
+  </div>
+`;
   } catch (e) {
     box.innerHTML = `<div class="alert alert-danger">Gagal memuat scenario terpilih</div>`;
   }
@@ -131,7 +310,7 @@ async function submitRejection() {
         if (Array.isArray(json)) ok = json[0]?.success === true || res.ok;
         else if (typeof json === "object" && json !== null)
           ok = json.success === true || res.ok;
-      } catch {}
+      } catch { }
     }
     if (ok) {
       document.getElementById("modal-title").innerText = "Rejected!";
@@ -197,7 +376,7 @@ document.getElementById("approveBtn")?.addEventListener("click", async () => {
         if (Array.isArray(json)) ok = json[0]?.success === true || res.ok;
         else if (typeof json === "object" && json !== null)
           ok = json.success === true || res.ok;
-      } catch {}
+      } catch { }
     }
     if (ok) {
       document.getElementById("modal-title").innerText = "Approved!";
