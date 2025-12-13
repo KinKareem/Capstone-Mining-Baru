@@ -10,7 +10,7 @@
 
 /* Background utama */
 body {
-  background: #ffffff;
+  background: #f8f9fa;
   height: 100vh;
   display: flex;
   align-items: center;
@@ -22,7 +22,7 @@ body {
   background: #ffffff;
   padding: 40px 60px;
   border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(0, 70, 50, 0.15);
+  box-shadow: 0 8px 20px rgba(44, 62, 80, 0.15);
   text-align: center;
 }
 
@@ -30,8 +30,7 @@ body {
 .title {
   font-size: 28px;
   font-weight: 700;
-  color: #2d5f4d;
-  /* hijau dove tua */
+  color: #2c3e50;
   padding-bottom: 50px;
 }
 
@@ -39,7 +38,7 @@ body {
   border: none;
   width: 100%;
   height: 1px;
-  background: #0eb97d3e;
+  background: rgba(52, 152, 219, 0.25);
   margin-bottom: 40px;
   margin-top: -30px;
   border-radius: 50px;
@@ -51,7 +50,7 @@ body {
 .OR {
   margin: 55px 0;
   font-size: 25px;
-  color: #000000;
+  color: #2c3e50;
 }
 
 /* Wrapper pilihan role */
@@ -63,8 +62,8 @@ body {
 
 /* Tombol role */
 .btn-role {
-  background: #f8fffb;
-  border: 2px solid #cce7dd;
+  background: #ffffff;
+  border: 2px solid #dee2e6;
   border-radius: 14px;
   width: 180px;
   padding: 25px 10px;
@@ -73,14 +72,14 @@ body {
   flex-direction: column;
   align-items: center;
   transition: 0.25s ease;
-  box-shadow: 0 4px 10px rgba(0, 100, 70, 0.08);
+  box-shadow: 0 4px 10px rgba(44, 62, 80, 0.08);
 }
 
 .btn-role:hover {
-  background: #d7f2e8;
+  background: #f1f5f9;
   transform: translateY(-5px);
-  border-color: #8bbfa9;
-  box-shadow: 0 8px 16px rgba(0, 80, 55, 0.16);
+  border-color: #3498db;
+  box-shadow: 0 8px 16px rgba(44, 62, 80, 0.16);
 }
 
 /* Icon */
@@ -94,15 +93,15 @@ body {
 .label {
   font-size: 18px;
   font-weight: 600;
-  color: #2e6a56;
+  color: #2c3e50;
 }
 
+/* Tombol back */
 .back-menu {
   position: fixed;
   top: 20px;
   left: 20px;
-  background: #2d5f4d;
-  /* hijau dove */
+  background: #2c3e50;
   color: white;
   padding: 10px 18px;
   border: none;
@@ -110,33 +109,22 @@ body {
   font-size: 15px;
   font-weight: 600;
   text-decoration: none;
-  /* agar link tidak bergaris bawah */
-  display: inline-block;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 70, 50, 0.25);
+  box-shadow: 0 4px 10px rgba(44, 62, 80, 0.25);
   transition: 0.25s ease;
   z-index: 999;
 }
 
 .back-menu:hover {
-  background: #3e7a63;
+  background: #34495e;
   transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0, 70, 50, 0.35);
-}
-
-
-.back-menu:hover {
-  background: #3e7a63;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0, 70, 50, 0.35);
+  box-shadow: 0 6px 14px rgba(44, 62, 80, 0.35);
 }
 
 /* Loader kecil di form */
 .loader {
-  border: 4px solid #f3f3f3;
-  /* abu-abu terang */
-  border-top: 4px solid #2d5f4d;
-  /* hijau dove */
+  border: 4px solid #e5e7eb;
+  border-top: 4px solid #3498db;
   border-radius: 50%;
   width: 25px;
   height: 25px;
@@ -154,9 +142,7 @@ body {
   }
 }
 
-
-
-/* ============================================================== 
+/* ==============================================================
    LOGIN / REGISTER PAGE (FORM STYLING)
 ============================================================== */
 .auth-form-container {
@@ -169,7 +155,7 @@ form label {
   text-align: left;
   font-size: 14px;
   margin-bottom: 6px;
-  color: #2d5f4d;
+  color: #2c3e50;
   font-weight: 600;
 }
 
@@ -178,22 +164,22 @@ form input {
   width: 100%;
   padding: 12px;
   border-radius: 10px;
-  border: 2px solid #cce7dd;
+  border: 2px solid #dee2e6;
   margin-bottom: 18px;
   font-size: 15px;
   transition: 0.2s ease;
 }
 
 form input:focus {
-  border-color: #6aa687;
+  border-color: #3498db;
   outline: none;
-  box-shadow: 0 0 6px rgba(80, 140, 110, 0.3);
+  box-shadow: 0 0 6px rgba(52, 152, 219, 0.35);
 }
 
 /* Tombol utama */
 .btn-primary {
   width: 100%;
-  background: #2d5f4d;
+  background: #3498db;
   color: white;
   padding: 12px;
   border: none;
@@ -206,13 +192,13 @@ form input:focus {
 }
 
 .btn-primary:hover {
-  background: #3e7a63;
-  box-shadow: 0 4px 12px rgba(0, 80, 55, 0.25);
+  background: #2f80c3;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
 }
 
 /* Link navigasi */
 p a {
-  color: #2d5f4d;
+  color: #3498db;
   font-weight: 600;
   text-decoration: none;
 }
@@ -228,10 +214,6 @@ p a:hover {
   font-weight: 600;
 }
 
-.mt-2 {
-  margin-top: 12px;
-}
-
 /* ==============================
    RESPONSIVE
 ============================== */
@@ -240,20 +222,18 @@ p a:hover {
     padding: 30px;
   }
 
-  /* Role selector */
   .role-option {
     flex-direction: column;
   }
 
   .OR {
-    margin: 0px 0;
+    margin: 20px 0;
   }
 
   .btn-role {
     width: 100%;
   }
 
-  /* Form */
   .auth-form-container {
     width: 100%;
     max-width: 350px;

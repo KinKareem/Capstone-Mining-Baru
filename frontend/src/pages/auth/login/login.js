@@ -1,4 +1,4 @@
-import "../../../style/style.css";
+import "../../../style/login_regis.css";
 import { postAuth } from "../../utils/api.js";
 import { putAccessToken } from "../../utils/auth.js";
 import { ROLE_ID_KEY } from "../../utils/config.js";
@@ -26,8 +26,8 @@ const updatePageTitle = () => {
           ? "/assets/Oil Pump.png"
           : "";
     pageTitle.innerHTML = `${roleIcon
-        ? ``
-        : ""
+      ? ``
+      : ""
       }<span>Login ${roleTitle}</span>`;
   }
 };

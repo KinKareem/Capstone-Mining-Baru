@@ -1,1 +1,1 @@
-import "./style/style.css";
+import "./style/login_regis.css";

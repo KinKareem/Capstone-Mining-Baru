@@ -1,4 +1,4 @@
-import "../../../style/style.css";
+import "../../../style/login_regis.css";
 import { postAuth } from "../../utils/api.js";
 
 const roleParam = new URLSearchParams(window.location.search).get("role");
