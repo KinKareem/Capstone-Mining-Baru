@@ -12,9 +12,9 @@ const router = express.Router();
 
 router.get("/", getShippingSchedules);
 router.get("/stats", getShippingStatistics);
-router.get("/:vessel_id", getShippingSchedule);
+router.get("/:vessel_code", getShippingSchedule);
 router.post("/", createNewShippingSchedule);
-router.patch("/:vessel_id", updateExistingShippingSchedule);
-router.delete("/:vessel_id", deleteExistingShippingSchedule);
+router.patch("/:vessel_code", updateExistingShippingSchedule);
+router.delete("/:vessel_code", deleteExistingShippingSchedule);
 
 export default router;

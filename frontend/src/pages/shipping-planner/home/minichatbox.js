@@ -2,7 +2,7 @@
 // KONFIGURASI N8N - UBAH SESUAI WEBHOOK ANDA
 // ============================================
 const N8N_CONFIG = {
-  webhookUrl: "https://pojer26018.app.n8n.cloud/webhook/chatai",
+  webhookUrl: "https://baticid356.app.n8n.cloud/webhook/freechat",
   method: "POST",
   headers: {
     "Content-Type": "application/json",

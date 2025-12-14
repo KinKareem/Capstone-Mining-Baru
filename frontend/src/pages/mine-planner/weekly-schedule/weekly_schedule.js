@@ -492,7 +492,7 @@ function logout() {
     localStorage.removeItem("auth_token");
     sessionStorage.clear();
 
-    window.location.href = "login.html";
+    window.location.href = "/index.html";
   }
 }
 

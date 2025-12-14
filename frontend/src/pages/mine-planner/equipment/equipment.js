@@ -454,6 +454,11 @@ function initializePage() {
   }
 }
 
+// Expose functions to global scope for HTML onclick attributes
+window.loadEquipment = loadEquipment;
+window.editEquipment = editEquipment;
+window.deleteEquipment = deleteEquipment;
+
 // Initialize when DOM is fully loaded
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initializePage);

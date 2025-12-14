@@ -1,8 +1,8 @@
 import { BASE_URL } from "../../../../pages/utils/config.js";
 const N8N_TRIGGER =
-  "https://pojer26018.app.n8n.cloud/webhook-test/recommendation";
+  "https://baticid356.app.n8n.cloud/webhook/recommendation";
 const N8N_SELECTED =
-  "https://pojer26018.app.n8n.cloud/webhook-test/selectedcard";
+  "https://baticid356.app.n8n.cloud/webhook/selectedcard";
 
 // 🔄 SHOW MODAL
 function showModal() {

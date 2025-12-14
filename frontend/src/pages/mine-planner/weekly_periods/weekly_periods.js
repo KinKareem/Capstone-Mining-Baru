@@ -211,14 +211,14 @@ function renderPeriodsTable(periods) {
                 </span>
             </td>
             <td class="text-end table-actions">
-                <button class="btn btn-sm btn-outline-primary me-1" onclick="editPeriod(${
+                <button class="btn btn-sm btn-outline-primary me-1 edit-btn" data-id="${
                   period.period_id
-                })">
+                }">
                     <i class="bi bi-pencil"></i>
                 </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deletePeriod(${
-                  period.period_id
-                })">
+                <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${
+                        period.period_id
+                      }">
                     <i class="bi bi-trash"></i>
                 </button>
             </td>
@@ -431,7 +431,7 @@ function logout() {
     localStorage.removeItem("auth_token");
     sessionStorage.clear();
 
-    window.location.href = "login.html";
+    window.location.href = "/index.html";
   }
 }
 
@@ -525,6 +525,22 @@ function initializePage() {
       document.getElementById("edit_period_code").focus();
     });
   }
+
+   document.addEventListener("click", function (e) {
+     // Untuk tombol edit
+     if (e.target.closest(".edit-btn")) {
+       const btn = e.target.closest(".edit-btn");
+       const periodId = btn.getAttribute("data-id");
+       if (periodId) editPeriod(periodId);
+     }
+
+     // Untuk tombol delete
+     if (e.target.closest(".delete-btn")) {
+       const btn = e.target.closest(".delete-btn");
+       const periodId = btn.getAttribute("data-id");
+       if (periodId) deletePeriod(periodId);
+     }
+   });
 }
 
 // Export functions for debugging
@@ -546,3 +562,5 @@ if (document.readyState === "loading") {
 } else {
   initializePage();
 }
+
+

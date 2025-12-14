@@ -115,12 +115,18 @@ async function loadEmployees() {
                     <td colspan="6" class="text-center py-5">
                         <i class="bi bi-exclamation-triangle text-danger fs-1"></i>
                         <p class="mt-2 text-danger">Failed to load data</p>
-                        <button class="btn btn-sm btn-primary mt-2" onclick="loadEmployees()">
+                        <button class="btn btn-sm btn-primary mt-2" id="retry-load-btn">
                             <i class="bi bi-arrow-clockwise me-1"></i> Try Again
                         </button>
                     </td>
                 </tr>
             `;
+
+      // Add event listener for retry button
+      const retryBtn = document.getElementById("retry-load-btn");
+      if (retryBtn) {
+        retryBtn.addEventListener("click", loadEmployees);
+      }
     }
   }
 }
@@ -132,32 +138,45 @@ async function loadEmployeeStats() {
     const stats = response.data.data || { total: 0, active: 0, inactive: 0 };
 
     // Update stats cards
-    document.getElementById("total-employees").textContent = formatNumber(
-      stats.total || 0
-    );
-    document.getElementById("active-employees").textContent = formatNumber(
-      stats.active || 0
-    );
-    document.getElementById("inactive-employees").textContent = formatNumber(
-      stats.inactive || 0
-    );
+    const totalEl = document.getElementById("total-employees");
+    const activeEl = document.getElementById("active-employees");
+    const inactiveEl = document.getElementById("inactive-employees");
+    const positionsEl = document.getElementById("total-positions");
+
+    if (totalEl) totalEl.textContent = formatNumber(stats.total || 0);
+    if (activeEl) activeEl.textContent = formatNumber(stats.active || 0);
+    if (inactiveEl) inactiveEl.textContent = formatNumber(stats.inactive || 0);
 
     // Count unique positions
     const positions = new Set(
       employeesList.map((emp) => emp.position).filter(Boolean)
     );
-    document.getElementById("total-positions").textContent = positions.size;
+    if (positionsEl) positionsEl.textContent = positions.size;
   } catch (error) {
     console.error("Error loading employee stats:", error);
+
+    // Set default values on error
+    const totalEl = document.getElementById("total-employees");
+    const activeEl = document.getElementById("active-employees");
+    const inactiveEl = document.getElementById("inactive-employees");
+    const positionsEl = document.getElementById("total-positions");
+
+    if (totalEl) totalEl.textContent = "0";
+    if (activeEl) activeEl.textContent = "0";
+    if (inactiveEl) inactiveEl.textContent = "0";
+    if (positionsEl) positionsEl.textContent = "0";
   }
 }
 
 // Filter employees based on search and status
 function filterEmployees() {
-  const searchTerm = document
-    .getElementById("search-employee")
-    .value.toLowerCase();
-  const statusFilter = document.getElementById("filter-status").value;
+  const searchInput = document.getElementById("search-employee");
+  const filterSelect = document.getElementById("filter-status");
+
+  if (!searchInput || !filterSelect) return;
+
+  const searchTerm = searchInput.value.toLowerCase();
+  const statusFilter = filterSelect.value;
 
   let filtered = employeesList;
 
@@ -190,12 +209,24 @@ function renderEmployeesTable(employees) {
                 <td colspan="6" class="text-center py-5">
                     <i class="bi bi-people fs-1 text-muted"></i>
                     <p class="mt-2 text-muted">No employees found</p>
-                    <button class="btn btn-sm btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+                    <button class="btn btn-sm btn-primary mt-2" id="add-first-employee-btn">
                         Add First Employee
                     </button>
                 </td>
             </tr>
         `;
+
+    // Add event listener for the button
+    const addFirstBtn = document.getElementById("add-first-employee-btn");
+    if (addFirstBtn) {
+      addFirstBtn.addEventListener("click", function () {
+        const addModal = new bootstrap.Modal(
+          document.getElementById("addEmployeeModal")
+        );
+        addModal.show();
+      });
+    }
+
     return;
   }
 
@@ -232,14 +263,14 @@ function renderEmployeesTable(employees) {
                     </span>
                 </td>
                 <td class="text-end table-actions">
-                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editEmployee(${
+                    <button class="btn btn-sm btn-outline-primary me-1 edit-btn" data-id="${
                       employee.employee_id
-                    })">
+                    }">
                         <i class="bi bi-pencil"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee(${
+                    <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${
                       employee.employee_id
-                    })">
+                    }">
                         <i class="bi bi-trash"></i>
                     </button>
                 </td>
@@ -251,11 +282,21 @@ function renderEmployeesTable(employees) {
 
 // Add new employee
 async function addEmployee() {
+  const name = document.getElementById("name");
+  const position = document.getElementById("position");
+  const status = document.getElementById("status");
+  const competency = document.getElementById("competency");
+
+  if (!name || !position || !status) {
+    showToast("warning", "Validation", "Form fields not found");
+    return false;
+  }
+
   const employeeData = {
-    name: document.getElementById("name").value,
-    position: document.getElementById("position").value,
-    status: document.getElementById("status").value,
-    competency: document.getElementById("competency").value || "",
+    name: name.value,
+    position: position.value,
+    status: status.value,
+    competency: competency.value || "",
   };
 
   // Validation
@@ -277,7 +318,11 @@ async function addEmployee() {
     if (addModal) {
       addModal.hide();
     }
-    document.getElementById("addEmployeeForm").reset();
+
+    const addForm = document.getElementById("addEmployeeForm");
+    if (addForm) {
+      addForm.reset();
+    }
 
     // Show success message
     showToast("success", "Success", "Employee added successfully");
@@ -310,12 +355,17 @@ async function editEmployee(employeeId) {
     }
 
     // Fill form with employee data
-    document.getElementById("edit_employee_id").value = employee.employee_id;
-    document.getElementById("edit_name").value = employee.name;
-    document.getElementById("edit_position").value = employee.position;
-    document.getElementById("edit_status").value = employee.status;
-    document.getElementById("edit_competency").value =
-      employee.competency || "";
+    const editId = document.getElementById("edit_employee_id");
+    const editName = document.getElementById("edit_name");
+    const editPosition = document.getElementById("edit_position");
+    const editStatus = document.getElementById("edit_status");
+    const editCompetency = document.getElementById("edit_competency");
+
+    if (editId) editId.value = employee.employee_id;
+    if (editName) editName.value = employee.name;
+    if (editPosition) editPosition.value = employee.position;
+    if (editStatus) editStatus.value = employee.status;
+    if (editCompetency) editCompetency.value = employee.competency || "";
 
     // Show modal
     const editModal = new bootstrap.Modal(
@@ -330,12 +380,23 @@ async function editEmployee(employeeId) {
 
 // Update employee
 async function updateEmployee() {
-  const employeeId = document.getElementById("edit_employee_id").value;
+  const editId = document.getElementById("edit_employee_id");
+  const editName = document.getElementById("edit_name");
+  const editPosition = document.getElementById("edit_position");
+  const editStatus = document.getElementById("edit_status");
+  const editCompetency = document.getElementById("edit_competency");
+
+  if (!editId || !editName || !editPosition || !editStatus) {
+    showToast("warning", "Validation", "Form fields not found");
+    return false;
+  }
+
+  const employeeId = editId.value;
   const employeeData = {
-    name: document.getElementById("edit_name").value,
-    position: document.getElementById("edit_position").value,
-    status: document.getElementById("edit_status").value,
-    competency: document.getElementById("edit_competency").value || "",
+    name: editName.value,
+    position: editPosition.value,
+    status: editStatus.value,
+    competency: editCompetency.value || "",
   };
 
   try {
@@ -403,18 +464,41 @@ function logout() {
   if (confirm("Are you sure you want to logout?")) {
     localStorage.removeItem("auth_token");
     sessionStorage.clear();
+    window.location.href = "/index.html";
+  }
+}
 
-    window.location.href = "login.html";
+// Handle event delegation for edit and delete buttons
+function handleTableEvents(e) {
+  // Tombol edit
+  if (e.target.closest(".edit-btn")) {
+    const btn = e.target.closest(".edit-btn");
+    const employeeId = btn.getAttribute("data-id");
+    if (employeeId) {
+      editEmployee(employeeId);
+    }
+  }
+
+  // Tombol delete
+  if (e.target.closest(".delete-btn")) {
+    const btn = e.target.closest(".delete-btn");
+    const employeeId = btn.getAttribute("data-id");
+    if (employeeId) {
+      deleteEmployee(employeeId);
+    }
   }
 }
 
 // Initialize the page
 function initializePage() {
+  // Load initial data
   loadEmployees();
 
+  // Update time every second
   setInterval(updateTime, 1000);
   updateTime();
 
+  // Add event listeners
   const saveEmployeeBtn = document.getElementById("btn-save-employee");
   if (saveEmployeeBtn) {
     saveEmployeeBtn.addEventListener("click", addEmployee);
@@ -457,6 +541,9 @@ function initializePage() {
     filterSelect.addEventListener("change", filterEmployees);
   }
 
+  // Event delegation untuk tombol edit dan delete
+  document.addEventListener("click", handleTableEvents);
+
   // Add keyboard shortcuts
   document.addEventListener("keydown", function (e) {
     // Ctrl + N to add new employee
@@ -490,19 +577,38 @@ function initializePage() {
   const addModal = document.getElementById("addEmployeeModal");
   if (addModal) {
     addModal.addEventListener("shown.bs.modal", function () {
-      document.getElementById("name").focus();
+      const nameInput = document.getElementById("name");
+      if (nameInput) {
+        nameInput.focus();
+      }
     });
   }
 
   const editModal = document.getElementById("editEmployeeModal");
   if (editModal) {
     editModal.addEventListener("shown.bs.modal", function () {
-      document.getElementById("edit_name").focus();
+      const editNameInput = document.getElementById("edit_name");
+      if (editNameInput) {
+        editNameInput.focus();
+      }
     });
   }
 }
 
-// Initialize when DOM is fully loaded
+// Export functions untuk debugging (opsional)
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = {
+    formatNumber,
+    formatDate,
+    loadEmployees,
+    addEmployee,
+    editEmployee,
+    updateEmployee,
+    deleteEmployee,
+  };
+}
+
+// Inisialisasi ketika halaman selesai dimuat
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initializePage);
 } else {

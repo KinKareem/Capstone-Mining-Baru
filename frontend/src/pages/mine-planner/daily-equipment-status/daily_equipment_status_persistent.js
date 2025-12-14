@@ -771,7 +771,7 @@ function logout() {
     localStorage.removeItem("auth_token");
     sessionStorage.clear();
 
-    window.location.href = "../auth/login.html";
+    window.location.href = "/index.html";
   }
 }
 
@@ -811,6 +811,15 @@ function initializePage() {
   const today = new Date().toISOString().split("T")[0];
   document.getElementById("view-date").value = today;
 }
+
+// Expose functions to global scope
+window.quickUpdateEquipment = quickUpdateEquipment;
+window.viewEquipmentHistory = viewEquipmentHistory;
+window.loadStatusHistory = loadStatusHistory;
+window.applyHistoryFilters = applyHistoryFilters;
+window.loadStatusForDate = loadStatusForDate;
+window.deleteStatusRecord = deleteStatusRecord;
+window.loadCurrentStatus = loadCurrentStatus;
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initializePage);

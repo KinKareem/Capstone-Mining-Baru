@@ -387,7 +387,7 @@ function logout() {
   if (confirm("Are you sure you want to logout?")) {
     localStorage.removeItem("auth_token");
     sessionStorage.clear();
-    window.location.href = "../auth/login.html";
+    window.location.href = "/index.html";
   }
 }
 

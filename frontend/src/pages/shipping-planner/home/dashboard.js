@@ -1,5 +1,5 @@
 import { BASE_URL } from "../../utils/config.js";
-import { getAccessToken } from "../../utils/auth.js";
+import { getAccessToken, removeAccessToken } from "../../utils/auth.js";
 
 // =========================
 //  TANGGAL FORMAT: "05 Des"
@@ -8,8 +8,18 @@ function formatDate(dateStr) {
   if (!dateStr) return "-";
   const [y, m, d] = dateStr.split("T")[0].split("-");
   const months = [
-    "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
-    "Jul", "Agu", "Sep", "Okt", "Nov", "Des"
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "Mei",
+    "Jun",
+    "Jul",
+    "Agu",
+    "Sep",
+    "Okt",
+    "Nov",
+    "Des",
   ];
   return `${d} ${months[Number(m) - 1]}`;
 }
@@ -29,7 +39,8 @@ async function fetchJson(path) {
 // =========================
 function renderBarChart(canvas, labels, values) {
   const ctx = canvas.getContext("2d");
-  const w = canvas.width, h = canvas.height;
+  const w = canvas.width,
+    h = canvas.height;
   ctx.clearRect(0, 0, w, h);
 
   const paddingLeft = 50;
@@ -80,7 +91,8 @@ function renderBarChart(canvas, labels, values) {
 // =========================
 function renderDualBarChart(canvas, labels, targetValues, actualValues) {
   const ctx = canvas.getContext("2d");
-  const w = canvas.width, h = canvas.height;
+  const w = canvas.width,
+    h = canvas.height;
   ctx.clearRect(0, 0, w, h);
 
   const paddingLeft = 50;
@@ -165,7 +177,9 @@ function renderPieChart(canvas, entries, legendEl) {
       .map(
         (e, i) =>
           `<div class="legend-item">
-            <span class="legend-swatch" style="background:${colors[i % colors.length]}"></span>
+            <span class="legend-swatch" style="background:${
+              colors[i % colors.length]
+            }"></span>
             ${e.label}
           </div>`
       )
@@ -178,7 +192,8 @@ function renderPieChart(canvas, entries, legendEl) {
 // =========================
 function renderLineChart(canvas, labels, values) {
   const ctx = canvas.getContext("2d");
-  const w = canvas.width, h = canvas.height;
+  const w = canvas.width,
+    h = canvas.height;
   ctx.clearRect(0, 0, w, h);
 
   const paddingLeft = 50;
@@ -211,7 +226,8 @@ function renderLineChart(canvas, labels, values) {
   labels.forEach((_, i) => {
     const x = paddingLeft + (i / Math.max(1, labels.length - 1)) * chartWidth;
     const v = values[i] ?? 0;
-    const y = h - paddingBottom - Math.round((v / (yTicks * step)) * chartHeight);
+    const y =
+      h - paddingBottom - Math.round((v / (yTicks * step)) * chartHeight);
 
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
@@ -239,7 +255,8 @@ function renderLineChart(canvas, labels, values) {
 // ====================================
 function renderGantt(container, items) {
   if (!items || items.length === 0) {
-    container.innerHTML = '<div class="text-center py-4 text-muted">No vessel data available</div>';
+    container.innerHTML =
+      '<div class="text-center py-4 text-muted">No vessel data available</div>';
     return;
   }
 
@@ -247,10 +264,17 @@ function renderGantt(container, items) {
 
   const oneDay = 1000 * 60 * 60 * 24;
 
-  const earliestDate = new Date(Math.min(...items.map(i => new Date(i.eta_date))));
-  const latestDate = new Date(Math.max(...items.map(i => new Date(i.latest_berthing || i.eta_date))));
+  const earliestDate = new Date(
+    Math.min(...items.map((i) => new Date(i.eta_date)))
+  );
+  const latestDate = new Date(
+    Math.max(...items.map((i) => new Date(i.latest_berthing || i.eta_date)))
+  );
 
-  const dateRange = Math.max(1, Math.ceil((latestDate - earliestDate) / oneDay));
+  const dateRange = Math.max(
+    1,
+    Math.ceil((latestDate - earliestDate) / oneDay)
+  );
 
   // KOLom antar kapal
   const colWidth = 80;
@@ -269,7 +293,10 @@ function renderGantt(container, items) {
 
   for (let i = dateRange; i >= 0; i--) {
     const d = new Date(latestDate.getTime() - i * oneDay);
-    const dateStr = d.toLocaleDateString("id-ID", { day: "2-digit", month: "short" });
+    const dateStr = d.toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "short",
+    });
 
     html += `
       <div style="height:22px; line-height:22px; border-bottom:1px dashed #e5e7eb;">
@@ -326,8 +353,6 @@ function renderGantt(container, items) {
   container.innerHTML = html;
 }
 
-
-
 // =========================
 //        WEATHER
 // =========================
@@ -342,18 +367,19 @@ async function loadWeather() {
     const workingHours = d.effective_working_hours ?? 0;
 
     // Update summary card
-    document.getElementById("weatherSummary").textContent =
-      `🌤️ Port Status: ${portStatus} • Rainfall: ${rainfall}mm`;
+    document.getElementById(
+      "weatherSummary"
+    ).textContent = `🌤️ Port Status: ${portStatus} • Rainfall: ${rainfall}mm`;
 
-    document.getElementById("weatherMeta").textContent =
-      `Wave Height: ${waveHeight}m • Effective Working Hours: ${workingHours}`;
+    document.getElementById(
+      "weatherMeta"
+    ).textContent = `Wave Height: ${waveHeight}m • Effective Working Hours: ${workingHours}`;
 
     // Update individual weather cards
     document.getElementById("wxRainfall").textContent = rainfall;
     document.getElementById("wxWave").textContent = waveHeight;
     document.getElementById("wxPort").textContent = portStatus;
     document.getElementById("wxHours").textContent = workingHours;
-
   } catch (error) {
     console.error("Error loading weather:", error);
     // Fallback data
@@ -379,12 +405,15 @@ async function initDashboard() {
     const kpi = await fetchJson("/shipping-dashboard/kpi");
     const d = kpi.data || {};
 
-    document.getElementById("kpiUpcomingVessel").textContent = d.upcomingVessel ?? 0;
-    document.getElementById("kpiWeeklyTarget").textContent =
-      (d.weeklyTarget ?? 0).toLocaleString("id-ID");
+    document.getElementById("kpiUpcomingVessel").textContent =
+      d.upcomingVessel ?? 0;
+    document.getElementById("kpiWeeklyTarget").textContent = (
+      d.weeklyTarget ?? 0
+    ).toLocaleString("id-ID");
     document.getElementById("kpiPortStatus").textContent = d.portStatus ?? "-";
-    document.getElementById("kpiWaveHeight").textContent = `${d.waveHeight ?? 0} m`;
-
+    document.getElementById("kpiWaveHeight").textContent = `${
+      d.waveHeight ?? 0
+    } m`;
   } catch (error) {
     console.error("Error loading KPI:", error);
     // Fallback values
@@ -400,8 +429,12 @@ async function initDashboard() {
     const rows = ta.data || [];
 
     const labels = rows.slice(0, 7).map((r) => r.vessel_name || "Vessel");
-    const targetValues = rows.slice(0, 7).map((r) => Number(r.target_load_tons || 0));
-    const actualValues = rows.slice(0, 7).map((r) => Number(r.actual_tonnage || 0));
+    const targetValues = rows
+      .slice(0, 7)
+      .map((r) => Number(r.target_load_tons || 0));
+    const actualValues = rows
+      .slice(0, 7)
+      .map((r) => Number(r.actual_tonnage || 0));
 
     const canvas = document.getElementById("targetActualChart");
     if (canvas) {
@@ -421,21 +454,21 @@ async function initDashboard() {
     const rows = statusData.data || [];
 
     const statusCounts = {
-      'Ready': 0,
-      'Arriving': 0,
-      'Loading': 0,
-      'Delayed': 0,
-      'Maintenance': 0
+      Ready: 0,
+      Arriving: 0,
+      Loading: 0,
+      Delayed: 0,
+      Maintenance: 0,
     };
 
-    rows.forEach(vessel => {
-      const status = vessel.status?.toLowerCase() || 'ready';
-      if (status.includes('ready')) statusCounts['Ready']++;
-      else if (status.includes('arriv')) statusCounts['Arriving']++;
-      else if (status.includes('load')) statusCounts['Loading']++;
-      else if (status.includes('delay')) statusCounts['Delayed']++;
-      else if (status.includes('maintenance')) statusCounts['Maintenance']++;
-      else statusCounts['Ready']++;
+    rows.forEach((vessel) => {
+      const status = vessel.status?.toLowerCase() || "ready";
+      if (status.includes("ready")) statusCounts["Ready"]++;
+      else if (status.includes("arriv")) statusCounts["Arriving"]++;
+      else if (status.includes("load")) statusCounts["Loading"]++;
+      else if (status.includes("delay")) statusCounts["Delayed"]++;
+      else if (status.includes("maintenance")) statusCounts["Maintenance"]++;
+      else statusCounts["Ready"]++;
     });
 
     const entries = Object.entries(statusCounts)
@@ -469,7 +502,8 @@ async function initDashboard() {
     console.error("Error loading schedule:", error);
     const container = document.getElementById("ganttContainer");
     if (container) {
-      container.innerHTML = '<div class="text-center py-4 text-muted">Failed to load vessel timeline</div>';
+      container.innerHTML =
+        '<div class="text-center py-4 text-muted">Failed to load vessel timeline</div>';
     }
   }
   // Weather Data
@@ -481,9 +515,10 @@ async function initDashboard() {
     let year = null;
 
     const renderBlending = async () => {
-      const url = week && year
-        ? `/shipping-dashboard/blending-plans?week=${week}&year=${year}`
-        : `/shipping-dashboard/blending-plans`;
+      const url =
+        week && year
+          ? `/shipping-dashboard/blending-plans?week=${week}&year=${year}`
+          : `/shipping-dashboard/blending-plans`;
 
       const res = await fetchJson(url);
       const rows = res.data || [];
@@ -496,18 +531,28 @@ async function initDashboard() {
             <tr>
               <td>${p.plan_week || "-"}</td>
               <td>${p.plan_year || "-"}</td>
-              <td>${p.target_tonnage_weekly?.toLocaleString("id-ID") || "0"}</td>
+              <td>${
+                p.target_tonnage_weekly?.toLocaleString("id-ID") || "0"
+              }</td>
               <td>${p.target_calori || "-"}</td>
               <td>${p.initial_ash_draft || "-"}</td>
               <td>${p.final_ash_result || "-"}</td>
               <td>
-                <span class="badge ${Number(p.is_approved_mine) === 1 ? "ok" : "pending"}">
+                <span class="badge ${
+                  Number(p.is_approved_mine) === 1 ? "ok" : "pending"
+                }">
                   ${Number(p.is_approved_mine) === 1 ? "Approved" : "Pending"}
                 </span>
               </td>
               <td>
-                <span class="badge ${Number(p.is_approved_shipping) === 1 ? "ok" : "pending"}">
-                  ${Number(p.is_approved_shipping) === 1 ? "Approved" : "Pending"}
+                <span class="badge ${
+                  Number(p.is_approved_shipping) === 1 ? "ok" : "pending"
+                }">
+                  ${
+                    Number(p.is_approved_shipping) === 1
+                      ? "Approved"
+                      : "Pending"
+                  }
                 </span>
               </td>
             </tr>`
@@ -527,7 +572,8 @@ async function initDashboard() {
     console.error("Error loading blending plans:", error);
     const tbody = document.querySelector("#shippingBlendingTable tbody");
     if (tbody) {
-      tbody.innerHTML = "<tr><td colspan='8' class='text-center'>No data available</td></tr>";
+      tbody.innerHTML =
+        "<tr><td colspan='8' class='text-center'>No data available</td></tr>";
     }
   }
 
@@ -539,7 +585,8 @@ async function initDashboard() {
     const accordion = document.getElementById("optimizationAccordion");
     if (accordion) {
       if (rows.length === 0) {
-        accordion.innerHTML = '<div class="text-center py-2 text-muted">No optimization logs available</div>';
+        accordion.innerHTML =
+          '<div class="text-center py-2 text-muted">No optimization logs available</div>';
       } else {
         accordion.innerHTML = rows
           .slice(0, 5) // Show only 5 most recent logs
@@ -552,13 +599,17 @@ async function initDashboard() {
             return `
               <div class="accordion-item">
                 <h2 class="accordion-header" id="h${id}">
-                  <button class="accordion-button ${isRejected ? "text-danger" : ""}" 
+                  <button class="accordion-button ${
+                    isRejected ? "text-danger" : ""
+                  }" 
                           type="button" 
                           data-bs-toggle="collapse" 
                           data-bs-target="#c${id}" 
                           aria-expanded="false" 
                           aria-controls="c${id}">
-                    ${r.plan_id || "Plan"} • v${r.version || "1"} • ${step} • ${r.created_at || ""}
+                    ${r.plan_id || "Plan"} • v${r.version || "1"} • ${step} • ${
+              r.created_at || ""
+            }
                   </button>
                 </h2>
                 <div id="c${id}" 
@@ -578,8 +629,20 @@ async function initDashboard() {
     console.error("Error loading optimization logs:", error);
     const accordion = document.getElementById("optimizationAccordion");
     if (accordion) {
-      accordion.innerHTML = '<div class="text-center py-2 text-muted">Failed to load optimization logs</div>';
+      accordion.innerHTML =
+        '<div class="text-center py-2 text-muted">Failed to load optimization logs</div>';
     }
+  }
+
+  // Logout functionality
+  const logoutBtn = document.getElementById("logout-btn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      if (confirm("Are you sure you want to logout?")) {
+        removeAccessToken();
+        window.location.href = "/index.html";
+      }
+    });
   }
 }
 

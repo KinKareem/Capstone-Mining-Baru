@@ -9,6 +9,7 @@ export const getAllShippingSchedules = async () => {
                 DATE_FORMAT(eta_date, '%Y-%m-%d') as eta_date,
                 DATE_FORMAT(latest_berthing, '%Y-%m-%d') as latest_berthing,
                 target_load_tons,
+                loading_status,
                 shipping_notes,
                 DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i:%s') as updated_at
             FROM shipping_schedule 
@@ -20,22 +21,23 @@ export const getAllShippingSchedules = async () => {
   }
 };
 
-export const getShippingScheduleById = async (vessel_id) => {
+export const getShippingScheduleByCode = async (vessel_code) => {
   try {
     const [rows] = await dbPool.query(
       `
             SELECT 
-                vessel_id,
+                vessel_code,
                 vessel_name,
                 DATE_FORMAT(eta_date, '%Y-%m-%d') as eta_date,
                 DATE_FORMAT(latest_berthing, '%Y-%m-%d') as latest_berthing,
                 target_load_tons,
+                loading_status,
                 shipping_notes,
                 DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i:%s') as updated_at
             FROM shipping_schedule 
-            WHERE vessel_id = ?
+            WHERE vessel_code = ?
         `,
-      [vessel_id]
+      [vessel_code]
     );
 
     if (rows.length === 0) {
@@ -54,7 +56,7 @@ export const getShippingScheduleById = async (vessel_id) => {
 export const createShippingSchedule = async (scheduleData) => {
   try {
     const {
-      vessel_id,
+      vessel_code,
       vessel_name,
       eta_date,
       latest_berthing,
@@ -62,29 +64,33 @@ export const createShippingSchedule = async (scheduleData) => {
       shipping_notes,
     } = scheduleData;
 
+    // Set default loading_status jika tidak ada
+    const loading_status = scheduleData.loading_status || "waiting";
+
     const [result] = await dbPool.query(
       `
             INSERT INTO shipping_schedule 
-            (vessel_id, vessel_name, eta_date, latest_berthing, target_load_tons, shipping_notes, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            (vessel_code, vessel_name, eta_date, latest_berthing, target_load_tons, loading_status, shipping_notes, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
         `,
       [
-        vessel_id,
+        vessel_code,
         vessel_name,
         eta_date,
         latest_berthing,
         target_load_tons,
+        loading_status,
         shipping_notes,
       ]
     );
 
-    return getShippingScheduleById(vessel_id);
+    return getShippingScheduleByCode(vessel_code); // PERBAIKAN: panggil getShippingScheduleByCode, BUKAN getShippingScheduleById
   } catch (error) {
     throw new Error("Failed to create shipping schedule: " + error.message);
   }
 };
 
-export const updateShippingSchedule = async (vessel_id, scheduleData) => {
+export const updateShippingSchedule = async (vessel_code, scheduleData) => {
   try {
     const {
       vessel_name,
@@ -104,7 +110,7 @@ export const updateShippingSchedule = async (vessel_id, scheduleData) => {
                 target_load_tons = ?, 
                 shipping_notes = ?, 
                 updated_at = CURRENT_TIMESTAMP
-            WHERE vessel_id = ?
+            WHERE vessel_code = ?
         `,
       [
         vessel_name,
@@ -112,7 +118,7 @@ export const updateShippingSchedule = async (vessel_id, scheduleData) => {
         latest_berthing,
         target_load_tons,
         shipping_notes,
-        vessel_id,
+        vessel_code,
       ]
     );
 
@@ -120,7 +126,7 @@ export const updateShippingSchedule = async (vessel_id, scheduleData) => {
       throw new Error("Shipping schedule not found");
     }
 
-    return getShippingScheduleById(vessel_id);
+    return getShippingScheduleByCode(vessel_code); // PERBAIKAN: panggil getShippingScheduleByCode
   } catch (error) {
     if (error.message.includes("not found")) {
       throw error;
@@ -129,14 +135,14 @@ export const updateShippingSchedule = async (vessel_id, scheduleData) => {
   }
 };
 
-export const deleteShippingSchedule = async (vessel_id) => {
+export const deleteShippingSchedule = async (vessel_code) => {
   try {
     const [result] = await dbPool.query(
       `
             DELETE FROM shipping_schedule 
-            WHERE vessel_id = ?
+            WHERE vessel_code = ?
         `,
-      [vessel_id]
+      [vessel_code]
     );
 
     if (result.affectedRows === 0) {

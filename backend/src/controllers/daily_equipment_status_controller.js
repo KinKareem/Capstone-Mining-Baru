@@ -92,6 +92,7 @@ export const getEquipmentHistory = async (req, res) => {
     res.status(500).json({
       message: "Server Error",
       serverMessage: error.message,
+      errorDetail: error.toString() 
     });
   }
 };

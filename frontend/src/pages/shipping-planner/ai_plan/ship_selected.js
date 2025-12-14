@@ -3,9 +3,9 @@ import { BASE_URL } from "../../utils/config.js";
 const SUMMARY_URL = `${BASE_URL}/ai_summary/ai_summary`;
 const SELECTED_SCENARIO_URL = `${BASE_URL}/shipping-dashboard/selected-scenario`;
 const N8N_TRIGGER =
-  "https://pojer26018.app.n8n.cloud/webhook-test/recommendation";
+  "https://baticid356.app.n8n.cloud/webhook/recommendation";
 const N8N_APPROVAL =
-  "https://pojer26018.app.n8n.cloud/webhook-test/approval";
+  "https://baticid356.app.n8n.cloud/webhook/approval";
 const LOGS_URL = `${BASE_URL}/shipping-dashboard/optimization-logs`;
 
 // === Inject CSS langsung dari JS ===

@@ -109,7 +109,11 @@ export const getEquipmentStatusHistory = (equipmentId, limit = 30) => {
     LIMIT ?
   `;
 
-  return dbPool.execute(SQLQuery, [equipmentId, limit]);
+  // Ensure values are integers
+  const idValue = parseInt(equipmentId, 10);
+  const limitValue = parseInt(limit, 10);
+
+  return dbPool.execute(SQLQuery, [idValue, limitValue]);
 };
 
 // Create or update daily equipment status

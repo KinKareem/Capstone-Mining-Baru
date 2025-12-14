@@ -7,7 +7,7 @@ const toggleIcon = document.getElementById('toggleIcon');
 const typingIndicator = document.getElementById('typingIndicator');
 
 // ======= KONFIGURASI N8N =======
-const N8N_WEBHOOK_URL = 'https://pojer26018.app.n8n.cloud/webhook-test/recommendationchatbot';
+const N8N_WEBHOOK_URL = 'https://baticid356.app.n8n.cloud/webhook/recommendationchatbot';
 
 let sessionId = 'session_' + Date.now();
 

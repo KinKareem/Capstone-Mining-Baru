@@ -1,6 +1,6 @@
 import {
   getAllShippingSchedules,
-  getShippingScheduleById,
+  getShippingScheduleByCode,
   createShippingSchedule,
   updateShippingSchedule,
   deleteShippingSchedule,
@@ -25,8 +25,8 @@ export const getShippingSchedules = async (req, res) => {
 
 export const getShippingSchedule = async (req, res) => {
   try {
-    const { vessel_id } = req.params;
-    const schedule = await getShippingScheduleById(vessel_id);
+    const { vessel_code } = req.params;
+    const schedule = await getShippingScheduleByCode(vessel_code);
     res.status(200).json({
       success: true,
       data: schedule,
@@ -46,7 +46,7 @@ export const createNewShippingSchedule = async (req, res) => {
     const scheduleData = req.body;
 
     if (
-      !scheduleData.vessel_id ||
+      !scheduleData.vessel_code ||
       !scheduleData.vessel_name ||
       !scheduleData.eta_date
     ) {
@@ -73,8 +73,8 @@ export const createNewShippingSchedule = async (req, res) => {
 
 export const updateExistingShippingSchedule = async (req, res) => {
   try {
-    const { vessel_id } = req.params;
-    const updatedSchedule = await updateShippingSchedule(vessel_id, req.body);
+    const { vessel_code } = req.params;
+    const updatedSchedule = await updateShippingSchedule(vessel_code, req.body);
     res.status(200).json({
       success: true,
       message: "Shipping schedule updated successfully",
@@ -92,8 +92,8 @@ export const updateExistingShippingSchedule = async (req, res) => {
 
 export const deleteExistingShippingSchedule = async (req, res) => {
   try {
-    const { vessel_id } = req.params;
-    await deleteShippingSchedule(vessel_id);
+    const { vessel_code } = req.params;
+    await deleteShippingSchedule(vessel_code);
     res.status(200).json({
       success: true,
       message: "Shipping schedule deleted successfully",

@@ -125,7 +125,7 @@ function renderSchedulesTable(schedules) {
       (schedule) => `
         <tr>
             <td class="align-middle">
-                <strong>${schedule.vessel_id}</strong>
+                <strong>${schedule.vessel_code}</strong>
             </td>
             <td class="align-middle">
                 <i class="bi bi-ship me-1"></i> ${schedule.vessel_name}
@@ -160,13 +160,13 @@ function renderSchedulesTable(schedules) {
             <td class="text-end align-middle">
                 <div class="btn-group btn-group-sm" role="group">
                     <button class="btn btn-outline-primary me-1" onclick="editSchedule('${
-                    schedule.vessel_id
+                    schedule.vessel_code
                     }')">
                         <i class="bi bi-pencil"></i> Edit
                     </button>
 
                     <button class="btn btn-outline-danger" onclick="deleteSchedule('${
-                    schedule.vessel_id
+                    schedule.vessel_code
                     }')">
                         <i class="bi bi-trash"></i> Delete
                     </button>
@@ -241,16 +241,16 @@ function showMessage(message, type) {
   }, 5000);
 }
 
-window.editSchedule = function (vessel_id) {
-  const schedule = schedulesData.find((s) => s.vessel_id === vessel_id);
+window.editSchedule = function (vessel_code) {
+  const schedule = schedulesData.find((s) => s.vessel_code === vessel_code);
   if (!schedule) {
     showMessage("Schedule not found", "danger");
     return;
   }
 
-  currentEditingId = vessel_id;
+  currentEditingId = vessel_code;
 
-  document.getElementById("vessel_id").value = schedule.vessel_id;
+  document.getElementById("vessel_id").value = schedule.vessel_code;
   document.getElementById("vessel_name").value = schedule.vessel_name;
   document.getElementById("eta_date").value = schedule.eta_date;
   document.getElementById("latest_berthing").value = schedule.latest_berthing;
@@ -272,7 +272,7 @@ window.editSchedule = function (vessel_id) {
   modal.show();
 };
 
-window.deleteSchedule = async function (vessel_id) {
+window.deleteSchedule = async function (vessel_code) {
   if (
     !confirm(
       "Are you sure you want to delete this shipping schedule? This action cannot be undone."
@@ -282,7 +282,7 @@ window.deleteSchedule = async function (vessel_id) {
   }
 
   try {
-    const result = await deleteShippingSchedule(vessel_id);
+    const result = await deleteShippingSchedule(vessel_code);
     if (result.ok) {
       showMessage("Shipping schedule deleted successfully", "success");
       loadSchedules();
@@ -308,7 +308,7 @@ async function saveSchedule() {
   }
 
   const scheduleData = {
-    vessel_id: document.getElementById("vessel_id").value.trim(),
+    vessel_code: document.getElementById("vessel_id").value.trim(), // Ini benar, field id di HTML adalah vessel_id
     vessel_name: document.getElementById("vessel_name").value.trim(),
     eta_date: document.getElementById("eta_date").value,
     latest_berthing: document.getElementById("latest_berthing").value,
@@ -317,8 +317,12 @@ async function saveSchedule() {
     shipping_notes: document.getElementById("shipping_notes").value.trim(),
   };
 
+  // Debug: Lihat data yang akan dikirim
+  console.log("Data yang akan dikirim:", scheduleData);
+
+  // Validasi
   if (
-    !scheduleData.vessel_id ||
+    !scheduleData.vessel_code ||
     !scheduleData.vessel_name ||
     !scheduleData.eta_date ||
     !scheduleData.latest_berthing
@@ -330,14 +334,25 @@ async function saveSchedule() {
   try {
     let result;
     if (currentEditingId) {
-      const { vessel_id, ...updateData } = scheduleData;
+      // Untuk update, kirim semua kecuali vessel_code (jika tidak boleh diubah)
+      const updateData = {
+        vessel_name: scheduleData.vessel_name,
+        eta_date: scheduleData.eta_date,
+        latest_berthing: scheduleData.latest_berthing,
+        target_load_tons: scheduleData.target_load_tons,
+        shipping_notes: scheduleData.shipping_notes,
+      };
+
+      console.log("Update data:", updateData);
       result = await updateShippingSchedule(currentEditingId, updateData);
     } else {
+      // Untuk create, kirim semua data termasuk vessel_code
+      console.log("Create data:", scheduleData);
       result = await createShippingSchedule(scheduleData);
     }
 
-    if (result.success) {
-      showMessage(result.message, "success");
+    if (result && result.success) {
+      showMessage(result.message || "Schedule saved successfully", "success");
 
       const modal = bootstrap.Modal.getInstance(
         document.getElementById("addScheduleModal")
@@ -348,7 +363,7 @@ async function saveSchedule() {
 
       loadSchedules();
     } else {
-      showMessage("Failed to save schedule: " + result.message, "danger");
+      showMessage(result?.message || "Failed to save schedule", "danger");
     }
   } catch (error) {
     console.error("Error saving schedule:", error);
